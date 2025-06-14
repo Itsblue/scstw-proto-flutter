@@ -12,7 +12,7 @@ Duration convertReactionTimeToDuration(int time) {
 
 
 String? determineVersion(Settings settings) {
-  if (settings.hasRace() && !settings.hasStopwatchSettings()) {
+  if (settings.hasRace() && !settings.hasStopwatchSettings()) { // ignore: deprecated_member_use_from_same_package
     return '1.0.0';
   }
   if (settings.hasStopwatchSettings() && settings.hasSecuritySettings()) {
@@ -26,7 +26,7 @@ RaceFullState raceFullStateMiddleware(RaceFullState raceFullState, Settings sett
   if (version == null || version != "1.0.0") {
     return raceFullState;
   }
-  if (raceFullState.state == RaceFullState_State.IDLE_CLEAR_TO_START && settings.race.startProcedure.hasAutomatedStartProcedureSettings()) {
+  if (raceFullState.state == RaceFullState_State.IDLE_CLEAR_TO_START && settings.race.startProcedure.hasAutomatedStartProcedureSettings()) { // ignore: deprecated_member_use_from_same_package
     var newState = raceFullState.deepCopy();
 
     for (var lane in newState.laneStates) {
@@ -45,7 +45,7 @@ Settings settingsMiddleware(Settings settings, String? version) {
   if (version == null || version != "1.0.0") {
     return settings;
   }
-  if (settings.hasRace() && !settings.hasStopwatchSettings()) {
+  if (settings.hasRace() && !settings.hasStopwatchSettings()) { // ignore: deprecated_member_use_from_same_package
     var newSettings = settings.deepCopy();
     newSettings.sound.volume = settings.sound.volume > 254 ? 254 : settings.sound.volume;
     return newSettings;

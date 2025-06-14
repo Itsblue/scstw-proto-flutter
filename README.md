@@ -10,30 +10,42 @@ For general information about developing packages, see the Dart guide for
 and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
+# SCSTW Library
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+This package provides functionality for managing race states, lane states, and UI interactions in a training or competition environment. It is designed to handle complex race scenarios, including lane-specific actions, race state changes, and UI updates.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Race State Management**: Handle race states such as `FINISHED`, `RUNNING`, `DISABLED`, and more.
+- **Lane State Management**: Manage lane-specific actions like enabling/disabling lanes, handling falls, and computing available actions.
+- **UI Updates**: Dynamically update UI elements such as lane text, colors, and subtext based on race and lane states.
+- **Command Execution**: Send commands to control race and lane states, including enabling/disabling lanes and handling race finishes.
+- **Autostart Progress Handling**: Manage autostart progress based on race settings.
 
-## Getting started
+## Getting Started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+### Prerequisites
 
-## Usage
+- Dart SDK
+- Flutter framework (if used in a Flutter project)
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+### Installation
 
-```dart
-const like = 'sample';
+Run the following command to add the `scstw_lib` package to your project:
+
+```bash
+flutter pub add scstw_lib
 ```
 
-## Additional information
+### Usage
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+_uiStateController = UIStateController(_connection);
+
+_uiStateSubscription = _uiStateController.uiStateStream.listen((event) {
+  setState(() {
+    _uiState = event;
+  });
+});
+```
+

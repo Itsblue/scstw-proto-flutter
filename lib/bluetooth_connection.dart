@@ -143,11 +143,11 @@ class BluetoothConnection extends BaseStationConnection {
               control: service.characteristics.firstWhere((element) => element.uuid == Guid('${btTimerServicePrefix}0002')),
               settings: service.characteristics.firstWhere((element) => element.uuid == Guid('${btTimerServicePrefix}0003')),
             );
-            characteristics.raceFullState.setNotifyValue(true);
-            await characteristics.raceFullState.read();
-
             characteristics.settings.setNotifyValue(true);
             await characteristics.settings.read();
+
+            characteristics.raceFullState.setNotifyValue(true);
+            await characteristics.raceFullState.read();
 
             logger.d('Set up characteristics');
 

@@ -1,7 +1,7 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:scstw_lib/proto_out/Command.pb.dart';
-import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 import 'package:scstw_lib/proto_out/Settings.pb.dart';
+import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 
 abstract class BaseStationConnection {
   void scan(Function(List<ScanResult>) onScanResult);

@@ -19,7 +19,7 @@ String? determineVersion(Settings settings) {
   if (settings.hasStopwatchSettings() && settings.hasSecuritySettings()) {
     return '1.1.0';
   }
-  return null;
+  return "1.0.0";
 }
 
 
@@ -48,15 +48,6 @@ Settings settingsMiddleware(Settings settings, String? version) {
   }
   if (settings.hasRace() && !settings.hasStopwatchSettings()) {
     var newSettings = settings.deepCopy();
-    // Only for progress bar
-    newSettings.stopwatchSettings = StopwatchSettings(trainingClassicRaceMode: TrainingClassicRaceMode(
-      startProcedure: StartProcedure(
-        automatedStartProcedure: AutomatedStartProcedure(
-          sayReady: settings.race.startProcedure.automatedStartProcedureSettings.sayReady,
-          standstillDurationBeforeStart: settings.race.startProcedure.automatedStartProcedureSettings.standstillDurationBeforeReady
-        ),
-      )
-    ));
     newSettings.sound.volume = settings.sound.volume > 254 ? 254 : settings.sound.volume;
     return newSettings;
   }

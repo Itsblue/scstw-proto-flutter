@@ -169,7 +169,7 @@ class UIStateController {
                 .automatedStartProcedure
                 .standstillDurationBeforeStart
             : settings
-                .race
+                .race // ignore: deprecated_member_use_from_same_package
                 .startProcedure
                 .automatedStartProcedureSettings
                 .standstillDurationBeforeReady;

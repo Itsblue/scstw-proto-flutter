@@ -334,8 +334,7 @@ class UIStateController {
           laneFullState
                       .extraState
                       .trainingClassicRaceExtraState
-                      .timeIsCalculated ??
-                  false
+                      .timeIsCalculated
               ? TextDecoration.lineThrough
               : TextDecoration.none;
 
@@ -355,14 +354,13 @@ class UIStateController {
     }
 
     if (laneFullState
-            ?.extraState
+            .extraState
             .trainingClassicRaceExtraState
-            .autostartPending ??
-        false) {
+            .autostartPending) {
       return Colors.blue;
     }
 
-    switch (laneFullState?.state) {
+    switch (laneFullState.state) {
       case LaneFullState_State.IDLE:
       case LaneFullState_State.RUNNING_FOOT_DOWN:
       case LaneFullState_State.RUNNING:

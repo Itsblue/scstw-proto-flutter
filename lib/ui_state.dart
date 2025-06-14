@@ -329,10 +329,10 @@ class UIStateController {
     LaneFullState laneFullState,
     List<TextSpan> climbingTimeTextSpans,
   ) {
-    if (laneFullState?.climbingTime != 0) {
+    if (laneFullState.climbingTime != 0) {
       TextDecoration style =
           laneFullState
-                      ?.extraState
+                      .extraState
                       .trainingClassicRaceExtraState
                       .timeIsCalculated ??
                   false
@@ -342,7 +342,7 @@ class UIStateController {
       climbingTimeTextSpans.add(
         TextSpan(
           text:
-              "(${(laneFullState!.climbingTime / 1000.0).toStringAsFixed(3)})",
+              "(${(laneFullState.climbingTime / 1000.0).toStringAsFixed(3)})",
           style: TextStyle(decoration: style),
         ),
       );

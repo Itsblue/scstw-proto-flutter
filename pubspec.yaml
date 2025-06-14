@@ -1,7 +1,8 @@
 name: scstw_lib
-description: "A new Flutter package project."
+description: "A library enabling the communication with the itsblue.de climbing stopwatch"‚‚‚‚‚
 version: 0.0.1
-homepage:
+homepage: "https://itsblue.de/scstw"
+repository: "https://github.com/Itsblue/scstw-proto-flutter"
 
 environment:
   sdk: ^3.7.0

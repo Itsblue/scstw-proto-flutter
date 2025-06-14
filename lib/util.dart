@@ -1,7 +1,6 @@
 import 'package:protobuf/protobuf.dart';
 import 'package:scstw_lib/proto_out/RaceState.pbserver.dart';
 import 'package:scstw_lib/proto_out/Settings.pb.dart';
-import 'package:scstw_lib/proto_out/deprecated/RaceSettings.pb.dart';
 
 Duration convertClimbingTimeToDuration(int time) {
   return Duration(milliseconds: time);

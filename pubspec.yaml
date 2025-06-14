@@ -1,6 +1,6 @@
 name: scstw_lib
 description: "A library enabling the communication with the itsblue.de climbing stopwatch"
-version: 0.0.1
+version: 0.0.2
 homepage: "https://itsblue.de/scstw"
 repository: "https://github.com/Itsblue/scstw-proto-flutter"
 

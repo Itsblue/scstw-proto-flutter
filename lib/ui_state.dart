@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:scstw_lib/progress.dart';
 import 'package:scstw_lib/proto_out/Command.pb.dart';
 import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 import 'package:scstw_lib/proto_out/Settings.pb.dart';
+import 'package:scstw_lib/proto_out/SystemInfo.pb.dart';
 import 'package:scstw_lib/util.dart';
 
 import 'lane_timer.dart';
@@ -17,7 +20,7 @@ mixin EnumFlag on Enum {
   int get value => 1 << index;
 
   // Creates a operator "|" for enum.
-  int operator |(other) => value | other.value;
+  int operator |(EnumFlag other) => value | other.value;
 }
 
 // Extension "int" to verify that value contains the enum flag.
@@ -40,9 +43,8 @@ class UILaneState {
   LaneFullState? laneFullState;
   int availableLaneActions = 0;
   List<TextSpan> laneTextTime = [];
-  String? laneSubtext = null;
+  String? laneSubtext;
   Color laneTextColor = Colors.red;
-
 
   void Function()? onDisableLanePressed = () {};
   void Function()? onFallPressed = () {};
@@ -74,15 +76,21 @@ class UIStateController {
   final logger = Logger();
   final BaseStationConnection _connection;
   UIState lastUIState = UIState();
+  Settings _settings = Settings();
   final LaneTimer _timer = LaneTimer();
 
   final Progress _progress = Progress();
   bool _raceAlreadySent = false;
 
   String? _version;
+  SystemInfo? _systemInfo;
 
-  get version {
+  String? get version {
     return _version;
+  }
+
+  BaseStationFeatures get features {
+    return determineFeatures(_version);
   }
 
   final raceResultStreamController =
@@ -182,7 +190,6 @@ class UIStateController {
       },
     );
   }
-
 
   void _computeAvailableRaceActions(
     RaceFullState raceFullState,
@@ -332,31 +339,26 @@ class UIStateController {
     if (laneFullState.climbingTime != 0) {
       TextDecoration style =
           laneFullState
-                      .extraState
-                      .trainingClassicRaceExtraState
-                      .timeIsCalculated
+                  .extraState
+                  .trainingClassicRaceExtraState
+                  .timeIsCalculated
               ? TextDecoration.lineThrough
               : TextDecoration.none;
 
       climbingTimeTextSpans.add(
         TextSpan(
-          text:
-              "(${(laneFullState.climbingTime / 1000.0).toStringAsFixed(3)})",
+          text: "(${(laneFullState.climbingTime / 1000.0).toStringAsFixed(3)})",
           style: TextStyle(decoration: style),
         ),
       );
     }
   }
 
-  _determineLaneTextColor(LaneFullState laneFullState) {
-    if (lastUIState.laneStates.isEmpty) {
-      return Colors.red; // Default color if no lanes are available
-    }
-
+  Color _determineLaneTextColor(LaneFullState laneFullState) {
     if (laneFullState
-            .extraState
-            .trainingClassicRaceExtraState
-            .autostartPending) {
+        .extraState
+        .trainingClassicRaceExtraState
+        .autostartPending) {
       return Colors.blue;
     }
 
@@ -382,7 +384,6 @@ class UIStateController {
         return Colors.red;
     }
   }
-
 
   List<TextSpan> _createLaneTextWithTime(
     LaneFullState laneFullState,
@@ -414,7 +415,6 @@ class UIStateController {
     return climbingTimeTextSpans;
   }
 
-
   String? _createLaneSubText(LaneFullState laneFullState) {
     if (laneFullState.reactionTime != 0) {
       return 'Reaction Time: ${(convertReactionTimeToDuration(laneFullState.reactionTime).inMilliseconds / 1000).toStringAsFixed(3)}';
@@ -443,35 +443,47 @@ class UIStateController {
         _raceAlreadySent = false;
         break;
     }
+  }
 
+  UILaneState _createUILaneState(
+    RaceFullState raceFullState,
+    int index,
+    LaneFullState laneFullState,
+  ) {
+    final uiLaneState = UILaneState(
+      laneIndex: index,
+      laneFullState: laneFullState,
+    );
+    final otherLaneStates = List<LaneFullState>.from(raceFullState.laneStates)
+      ..removeAt(index);
+
+    _computeAvailableLaneActions(
+      raceFullState.state,
+      uiLaneState,
+      laneFullState,
+      otherLaneStates,
+    );
+    uiLaneState.laneTextTime = _createLaneTextWithTime(
+      laneFullState,
+      lastUIState.stopwatchDuration,
+    );
+    uiLaneState.laneTextColor = _determineLaneTextColor(laneFullState);
+    uiLaneState.laneSubtext = _createLaneSubText(laneFullState);
+
+    return uiLaneState;
   }
 
   void _onRaceState(RaceFullState raceFullState) {
     lastUIState.raceState = raceFullState.state;
 
-    for (var (index, lane) in raceFullState.laneStates.indexed) {
-      if (lastUIState.laneStates.length <= index) {
-        lastUIState.laneStates.add(UILaneState(laneIndex: index));
-      }
-      lastUIState.laneStates[index].laneFullState = lane;
+    final nextLaneStates = [
+      for (final (index, lane) in raceFullState.laneStates.indexed)
+        _createUILaneState(raceFullState, index, lane),
+    ];
+    lastUIState.laneStates = nextLaneStates;
 
-      List<LaneFullState> otherLaneStates = List.from(raceFullState.laneStates);
-      otherLaneStates.removeAt(index);
-      _computeAvailableLaneActions(
-        raceFullState.state,
-        lastUIState.laneStates[index],
-        lane,
-        otherLaneStates,
-      );
-      lastUIState.laneStates[index].laneTextTime = _createLaneTextWithTime(
-        lane,
-        lastUIState.stopwatchDuration,
-      );
-      lastUIState.laneStates[index].laneTextColor = _determineLaneTextColor(
-        lane,
-      );
-      lastUIState.laneStates[index].laneSubtext = _createLaneSubText(lane);
-      _handleLaneStateChange(lastUIState.laneStates[index], raceFullState);
+    for (final laneState in nextLaneStates) {
+      _handleLaneStateChange(laneState, raceFullState);
     }
     _handleAutostartProgress(raceFullState, lastUIState.settings);
     _computeAvailableRaceActions(raceFullState, lastUIState.settings);
@@ -485,15 +497,29 @@ class UIStateController {
     _uiStateController.add(lastUIState);
   }
 
-  void _onSettings(Settings settings) {
-    lastUIState.settings = settings;
-    _version ??= determineVersion(settings);
-    lastUIState.settings = settingsMiddleware(settings, _version);
+  void _onSystemInfo(SystemInfo systemInfo) {
+    _systemInfo = systemInfo;
+    _updateVersion();
     _uiStateController.add(lastUIState);
+  }
+
+  void _onSettings(Settings settings) {
+    _settings = settings;
+    _updateVersion();
+    _uiStateController.add(lastUIState);
+  }
+
+  void _updateVersion() {
+    _version = determineVersion(_settings, _systemInfo);
+    logger.d("Version: $_version");
+    lastUIState.settings = settingsMiddleware(_settings, _version);
   }
 
   UIStateController(this._connection) {
     // Setting must be listened on first because, such that the version can be determined
+    _connection.onSystemInfo.listen((systemInfo) {
+      _onSystemInfo(systemInfo);
+    });
     _connection.onSettings.listen((settings) {
       _onSettings(settings);
     });

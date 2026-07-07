@@ -7,6 +7,7 @@ import 'package:scstw_lib/connection.dart';
 import 'package:scstw_lib/proto_out/Command.pb.dart';
 import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 import 'package:scstw_lib/proto_out/Settings.pb.dart';
+import 'package:scstw_lib/proto_out/SystemInfo.pb.dart';
 
 const btBaseUuid = '97ed638a-690f-4ce4-bb12-d9c4e0';
 const btTimerServicePrefix = '${btBaseUuid}01';
@@ -14,15 +15,23 @@ const btTimerServiceUuid = '${btTimerServicePrefix}0000';
 
 const remoteFileId = 'remoteId.txt';
 
+extension _FirstWhereOrNull<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    return where(test).firstOrNull;
+  }
+}
+
 class BaseStationBluetoothCharacteristics {
   final BluetoothCharacteristic raceFullState;
   final BluetoothCharacteristic control;
   final BluetoothCharacteristic settings;
+  final BluetoothCharacteristic? systemInfo;
 
   BaseStationBluetoothCharacteristics({
     required this.raceFullState,
     required this.control,
     required this.settings,
+    this.systemInfo,
   });
 
   Future<void> sendCommand(Command command) async {
@@ -44,6 +53,16 @@ class BaseStationBluetoothCharacteristics {
       return Settings.fromBuffer(event);
     });
   }
+
+  bool get hasSystemInfo => systemInfo != null;
+
+  Stream<SystemInfo> get onSystemInfo {
+    final characteristic = systemInfo;
+    if (characteristic == null) {
+      return const Stream.empty();
+    }
+    return characteristic.lastValueStream.map(SystemInfo.fromBuffer);
+  }
 }
 
 //FIXME: Do we need this enum?
@@ -51,24 +70,28 @@ enum BaseStationConnectionEnum {
   disconnected,
   connected,
   connecting,
-  disconnecting
+  disconnecting,
 }
 
 class BluetoothConnection extends BaseStationConnection {
   final logger = Logger();
-  final StreamController<BaseStationConnectionEnum> _baseStationConnectionStateController = StreamController<BaseStationConnectionEnum>.broadcast();
-  Stream<BaseStationConnectionEnum> get baseStationConnectionStateStream => _baseStationConnectionStateController.stream;
-
+  final StreamController<BaseStationConnectionEnum>
+  _baseStationConnectionStateController =
+      StreamController<BaseStationConnectionEnum>.broadcast();
+  Stream<BaseStationConnectionEnum> get baseStationConnectionStateStream =>
+      _baseStationConnectionStateController.stream;
 
   var bluetoothState = BluetoothAdapterState.unknown;
   var _baseStationConnectionState = BaseStationConnectionEnum.disconnected;
 
-  late StreamSubscription<BluetoothConnectionState> _connectionStateSubscription;
+  late StreamSubscription<BluetoothConnectionState>
+  _connectionStateSubscription;
   late StreamSubscription<BluetoothAdapterState> _bluetoothStateSubscription;
 
   late BluetoothDevice device;
   late BluetoothService service;
   late BaseStationBluetoothCharacteristics characteristics;
+  bool _characteristicsInitialized = false;
 
   BluetoothConnection.init() {
     _bluetoothStateSubscription = FlutterBluePlus.adapterState.listen((state) {
@@ -103,18 +126,22 @@ class BluetoothConnection extends BaseStationConnection {
 
   @override
   void scan(Function(List<ScanResult>) onScanResult) {
-    FlutterBluePlus.cancelWhenScanComplete(FlutterBluePlus.scanResults.listen(onScanResult));
+    FlutterBluePlus.cancelWhenScanComplete(
+      FlutterBluePlus.scanResults.listen(onScanResult),
+    );
 
     FlutterBluePlus.startScan(
-        withServices: [Guid(btTimerServiceUuid)],
-        timeout: const Duration(seconds: 5));
+      withServices: [Guid(btTimerServiceUuid)],
+      timeout: const Duration(seconds: 5),
+    );
   }
-
 
   @override
   Future<void> connect(BluetoothDevice device) async {
     _baseStationConnectionState = BaseStationConnectionEnum.connecting;
-    _baseStationConnectionStateController.add(BaseStationConnectionEnum.connecting);
+    _baseStationConnectionStateController.add(
+      BaseStationConnectionEnum.connecting,
+    );
     // Otherwise scan for devices
     // var onScan = FlutterBluePlus.scanResults.listen((results) async {
     //   // FlutterBluePlus.stopScan();
@@ -137,12 +164,31 @@ class BluetoothConnection extends BaseStationConnection {
         case BluetoothConnectionState.connected:
           var services = device.discoverServices();
           services.then((value) async {
-            service = value.firstWhere((element) => element.uuid == Guid(btTimerServiceUuid));
-            characteristics = BaseStationBluetoothCharacteristics(
-              raceFullState: service.characteristics.firstWhere((element) => element.uuid == Guid('${btTimerServicePrefix}0001')),
-              control: service.characteristics.firstWhere((element) => element.uuid == Guid('${btTimerServicePrefix}0002')),
-              settings: service.characteristics.firstWhere((element) => element.uuid == Guid('${btTimerServicePrefix}0003')),
+            service = value.firstWhere(
+              (element) => element.uuid == Guid(btTimerServiceUuid),
             );
+            characteristics = BaseStationBluetoothCharacteristics(
+              raceFullState: service.characteristics.firstWhere(
+                (element) =>
+                    element.uuid == Guid('${btTimerServicePrefix}0001'),
+              ),
+              control: service.characteristics.firstWhere(
+                (element) =>
+                    element.uuid == Guid('${btTimerServicePrefix}0002'),
+              ),
+              settings: service.characteristics.firstWhere(
+                (element) =>
+                    element.uuid == Guid('${btTimerServicePrefix}0003'),
+              ),
+              systemInfo: service.characteristics.firstWhereOrNull(
+                (element) =>
+                    element.uuid == Guid('${btTimerServicePrefix}0004'),
+              ),
+            );
+            _characteristicsInitialized = true;
+
+            await characteristics.systemInfo?.read();
+
             characteristics.settings.setNotifyValue(true);
             await characteristics.settings.read();
 
@@ -155,18 +201,22 @@ class BluetoothConnection extends BaseStationConnection {
             //   logger.d("Event: $event");
             // });
             _baseStationConnectionState = BaseStationConnectionEnum.connected;
-            _baseStationConnectionStateController.add(BaseStationConnectionEnum.connected);
+            _baseStationConnectionStateController.add(
+              BaseStationConnectionEnum.connected,
+            );
           });
           break;
         case BluetoothConnectionState.disconnected:
           _baseStationConnectionState = BaseStationConnectionEnum.disconnected;
-          _baseStationConnectionStateController.add(BaseStationConnectionEnum.disconnected);
+          _characteristicsInitialized = false;
+          _baseStationConnectionStateController.add(
+            BaseStationConnectionEnum.disconnected,
+          );
           break;
         default:
           break;
       }
     });
-
 
     await device.connect(autoConnect: false, mtu: 512);
     // FlutterBluePlus.cancelWhenScanComplete(onScan);
@@ -183,7 +233,10 @@ class BluetoothConnection extends BaseStationConnection {
     _connectionStateSubscription.cancel();
     _bluetoothStateSubscription.cancel();
     _baseStationConnectionState = BaseStationConnectionEnum.disconnected;
-    _baseStationConnectionStateController.add(BaseStationConnectionEnum.disconnected);
+    _characteristicsInitialized = false;
+    _baseStationConnectionStateController.add(
+      BaseStationConnectionEnum.disconnected,
+    );
   }
 
   @override
@@ -212,10 +265,22 @@ class BluetoothConnection extends BaseStationConnection {
     return characteristics.onSettings;
   }
 
+  @override
+  bool get hasSystemInfo {
+    return _characteristicsInitialized && characteristics.hasSystemInfo;
+  }
+
+  @override
+  Stream<SystemInfo> get onSystemInfo {
+    if (!_characteristicsInitialized) {
+      return const Stream.empty();
+    }
+    return characteristics.onSystemInfo;
+  }
+
   // Stream<BaseStationConnectionEnum> get baseStationConnectionStateStream => _baseStationConnectionStateStream;
 
-  BaseStationConnectionEnum get baseStationConnectionState => _baseStationConnectionState;
+  BaseStationConnectionEnum get baseStationConnectionState =>
+      _baseStationConnectionState;
   // BluetoothAdapterState get connectionState => _conn;
-
 }
-

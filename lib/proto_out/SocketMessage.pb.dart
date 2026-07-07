@@ -13,22 +13,25 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'Command.pb.dart' as $1;
-import 'RaceState.pb.dart' as $0;
-import 'Settings.pb.dart' as $2;
+import 'Command.pb.dart' as $2;
+import 'RaceState.pb.dart' as $1;
+import 'Settings.pb.dart' as $3;
+import 'SystemInfo.pb.dart' as $4;
 
 enum SocketMessage_Message {
   raceFullState, 
   command, 
   settings, 
+  systemInfo, 
   notSet
 }
 
 class SocketMessage extends $pb.GeneratedMessage {
   factory SocketMessage({
-    $0.RaceFullState? raceFullState,
-    $1.Command? command,
-    $2.Settings? settings,
+    $1.RaceFullState? raceFullState,
+    $2.Command? command,
+    $3.Settings? settings,
+    $4.SystemInfo? systemInfo,
   }) {
     final $result = create();
     if (raceFullState != null) {
@@ -40,6 +43,9 @@ class SocketMessage extends $pb.GeneratedMessage {
     if (settings != null) {
       $result.settings = settings;
     }
+    if (systemInfo != null) {
+      $result.systemInfo = systemInfo;
+    }
     return $result;
   }
   SocketMessage._() : super();
@@ -50,13 +56,15 @@ class SocketMessage extends $pb.GeneratedMessage {
     1 : SocketMessage_Message.raceFullState,
     2 : SocketMessage_Message.command,
     3 : SocketMessage_Message.settings,
+    4 : SocketMessage_Message.systemInfo,
     0 : SocketMessage_Message.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SocketMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..oo(0, [1, 2, 3])
-    ..aOM<$0.RaceFullState>(1, _omitFieldNames ? '' : 'raceFullState', protoName: 'raceFullState', subBuilder: $0.RaceFullState.create)
-    ..aOM<$1.Command>(2, _omitFieldNames ? '' : 'command', subBuilder: $1.Command.create)
-    ..aOM<$2.Settings>(3, _omitFieldNames ? '' : 'settings', subBuilder: $2.Settings.create)
+    ..oo(0, [1, 2, 3, 4])
+    ..aOM<$1.RaceFullState>(1, _omitFieldNames ? '' : 'raceFullState', protoName: 'raceFullState', subBuilder: $1.RaceFullState.create)
+    ..aOM<$2.Command>(2, _omitFieldNames ? '' : 'command', subBuilder: $2.Command.create)
+    ..aOM<$3.Settings>(3, _omitFieldNames ? '' : 'settings', subBuilder: $3.Settings.create)
+    ..aOM<$4.SystemInfo>(4, _omitFieldNames ? '' : 'systemInfo', protoName: 'systemInfo', subBuilder: $4.SystemInfo.create)
     ..hasRequiredFields = false
   ;
 
@@ -85,37 +93,48 @@ class SocketMessage extends $pb.GeneratedMessage {
   void clearMessage() => clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
-  $0.RaceFullState get raceFullState => $_getN(0);
+  $1.RaceFullState get raceFullState => $_getN(0);
   @$pb.TagNumber(1)
-  set raceFullState($0.RaceFullState v) { setField(1, v); }
+  set raceFullState($1.RaceFullState v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasRaceFullState() => $_has(0);
   @$pb.TagNumber(1)
   void clearRaceFullState() => clearField(1);
   @$pb.TagNumber(1)
-  $0.RaceFullState ensureRaceFullState() => $_ensure(0);
+  $1.RaceFullState ensureRaceFullState() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $1.Command get command => $_getN(1);
+  $2.Command get command => $_getN(1);
   @$pb.TagNumber(2)
-  set command($1.Command v) { setField(2, v); }
+  set command($2.Command v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasCommand() => $_has(1);
   @$pb.TagNumber(2)
   void clearCommand() => clearField(2);
   @$pb.TagNumber(2)
-  $1.Command ensureCommand() => $_ensure(1);
+  $2.Command ensureCommand() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  $2.Settings get settings => $_getN(2);
+  $3.Settings get settings => $_getN(2);
   @$pb.TagNumber(3)
-  set settings($2.Settings v) { setField(3, v); }
+  set settings($3.Settings v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasSettings() => $_has(2);
   @$pb.TagNumber(3)
   void clearSettings() => clearField(3);
   @$pb.TagNumber(3)
-  $2.Settings ensureSettings() => $_ensure(2);
+  $3.Settings ensureSettings() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  $4.SystemInfo get systemInfo => $_getN(3);
+  @$pb.TagNumber(4)
+  set systemInfo($4.SystemInfo v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasSystemInfo() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSystemInfo() => clearField(4);
+  @$pb.TagNumber(4)
+  $4.SystemInfo ensureSystemInfo() => $_ensure(3);
 }
 
 

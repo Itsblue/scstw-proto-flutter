@@ -13,7 +13,10 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'deprecated/RaceSettings.pb.dart' as $0;
+import 'Settings.pbenum.dart';
+import 'deprecated/Settings.pb.dart' as $0;
+
+export 'Settings.pbenum.dart';
 
 class SoundSettings extends $pb.GeneratedMessage {
   factory SoundSettings({
@@ -209,10 +212,14 @@ class ManualStartProcedure extends $pb.GeneratedMessage {
 class CompetitionClassicRaceMode extends $pb.GeneratedMessage {
   factory CompetitionClassicRaceMode({
     ManualStartProcedure? manualStartProcedure,
+    CompetitionRound? round,
   }) {
     final $result = create();
     if (manualStartProcedure != null) {
       $result.manualStartProcedure = manualStartProcedure;
+    }
+    if (round != null) {
+      $result.round = round;
     }
     return $result;
   }
@@ -222,6 +229,7 @@ class CompetitionClassicRaceMode extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CompetitionClassicRaceMode', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
     ..aOM<ManualStartProcedure>(1, _omitFieldNames ? '' : 'manualStartProcedure', protoName: 'manualStartProcedure', subBuilder: ManualStartProcedure.create)
+    ..e<CompetitionRound>(2, _omitFieldNames ? '' : 'round', $pb.PbFieldType.OE, defaultOrMaker: CompetitionRound.UNSPECIFIED, valueOf: CompetitionRound.valueOf, enumValues: CompetitionRound.values)
     ..hasRequiredFields = false
   ;
 
@@ -256,6 +264,16 @@ class CompetitionClassicRaceMode extends $pb.GeneratedMessage {
   void clearManualStartProcedure() => clearField(1);
   @$pb.TagNumber(1)
   ManualStartProcedure ensureManualStartProcedure() => $_ensure(0);
+
+  /// Added in 1.3.0
+  @$pb.TagNumber(2)
+  CompetitionRound get round => $_getN(1);
+  @$pb.TagNumber(2)
+  set round(CompetitionRound v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasRound() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRound() => clearField(2);
 }
 
 /// = Training classic race =
@@ -478,200 +496,23 @@ class LaneSettings extends $pb.GeneratedMessage {
   void clearDisabled() => clearField(2);
 }
 
-class AbortAfterFalseStart extends $pb.GeneratedMessage {
-  factory AbortAfterFalseStart() => create();
-  AbortAfterFalseStart._() : super();
-  factory AbortAfterFalseStart.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory AbortAfterFalseStart.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AbortAfterFalseStart', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  AbortAfterFalseStart clone() => AbortAfterFalseStart()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  AbortAfterFalseStart copyWith(void Function(AbortAfterFalseStart) updates) => super.copyWith((message) => updates(message as AbortAfterFalseStart)) as AbortAfterFalseStart;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static AbortAfterFalseStart create() => AbortAfterFalseStart._();
-  AbortAfterFalseStart createEmptyInstance() => create();
-  static $pb.PbList<AbortAfterFalseStart> createRepeated() => $pb.PbList<AbortAfterFalseStart>();
-  @$core.pragma('dart2js:noInline')
-  static AbortAfterFalseStart getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AbortAfterFalseStart>(create);
-  static AbortAfterFalseStart? _defaultInstance;
-}
-
-class ContinueAfterFalseStart extends $pb.GeneratedMessage {
-  factory ContinueAfterFalseStart({
-    $core.int? assumedReactionTime,
-    $core.bool? continueStartSequenceAfterFalseStart,
-  }) {
-    final $result = create();
-    if (assumedReactionTime != null) {
-      $result.assumedReactionTime = assumedReactionTime;
-    }
-    if (continueStartSequenceAfterFalseStart != null) {
-      $result.continueStartSequenceAfterFalseStart = continueStartSequenceAfterFalseStart;
-    }
-    return $result;
-  }
-  ContinueAfterFalseStart._() : super();
-  factory ContinueAfterFalseStart.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ContinueAfterFalseStart.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ContinueAfterFalseStart', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..a<$core.int>(1, _omitFieldNames ? '' : 'assumedReactionTime', $pb.PbFieldType.OU3, protoName: 'assumedReactionTime')
-    ..aOB(2, _omitFieldNames ? '' : 'continueStartSequenceAfterFalseStart', protoName: 'continueStartSequenceAfterFalseStart')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  ContinueAfterFalseStart clone() => ContinueAfterFalseStart()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  ContinueAfterFalseStart copyWith(void Function(ContinueAfterFalseStart) updates) => super.copyWith((message) => updates(message as ContinueAfterFalseStart)) as ContinueAfterFalseStart;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static ContinueAfterFalseStart create() => ContinueAfterFalseStart._();
-  ContinueAfterFalseStart createEmptyInstance() => create();
-  static $pb.PbList<ContinueAfterFalseStart> createRepeated() => $pb.PbList<ContinueAfterFalseStart>();
-  @$core.pragma('dart2js:noInline')
-  static ContinueAfterFalseStart getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ContinueAfterFalseStart>(create);
-  static ContinueAfterFalseStart? _defaultInstance;
-
-  /// This time will be assumed as the reaction time when calculating the final
-  /// time. Maximum value is 10000, default value is 100.
-  @$pb.TagNumber(1)
-  $core.int get assumedReactionTime => $_getIZ(0);
-  @$pb.TagNumber(1)
-  set assumedReactionTime($core.int v) { $_setUnsignedInt32(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasAssumedReactionTime() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearAssumedReactionTime() => clearField(1);
-
-  /// If set to true, there will be no false start tone and the normal tone will
-  /// continue. Also, the indicator of wildcard lanes will continue as normal.
-  @$pb.TagNumber(2)
-  $core.bool get continueStartSequenceAfterFalseStart => $_getBF(1);
-  @$pb.TagNumber(2)
-  set continueStartSequenceAfterFalseStart($core.bool v) { $_setBool(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasContinueStartSequenceAfterFalseStart() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearContinueStartSequenceAfterFalseStart() => clearField(2);
-}
-
-enum FalseStartBehaviour_Behaviour {
-  abortAfterFalseStart, 
-  continueAfterFalseStart, 
-  notSet
-}
-
-class FalseStartBehaviour extends $pb.GeneratedMessage {
-  factory FalseStartBehaviour({
-    AbortAfterFalseStart? abortAfterFalseStart,
-    ContinueAfterFalseStart? continueAfterFalseStart,
-  }) {
-    final $result = create();
-    if (abortAfterFalseStart != null) {
-      $result.abortAfterFalseStart = abortAfterFalseStart;
-    }
-    if (continueAfterFalseStart != null) {
-      $result.continueAfterFalseStart = continueAfterFalseStart;
-    }
-    return $result;
-  }
-  FalseStartBehaviour._() : super();
-  factory FalseStartBehaviour.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory FalseStartBehaviour.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static const $core.Map<$core.int, FalseStartBehaviour_Behaviour> _FalseStartBehaviour_BehaviourByTag = {
-    1 : FalseStartBehaviour_Behaviour.abortAfterFalseStart,
-    2 : FalseStartBehaviour_Behaviour.continueAfterFalseStart,
-    0 : FalseStartBehaviour_Behaviour.notSet
-  };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FalseStartBehaviour', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..oo(0, [1, 2])
-    ..aOM<AbortAfterFalseStart>(1, _omitFieldNames ? '' : 'abortAfterFalseStart', protoName: 'abortAfterFalseStart', subBuilder: AbortAfterFalseStart.create)
-    ..aOM<ContinueAfterFalseStart>(2, _omitFieldNames ? '' : 'continueAfterFalseStart', protoName: 'continueAfterFalseStart', subBuilder: ContinueAfterFalseStart.create)
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  FalseStartBehaviour clone() => FalseStartBehaviour()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  FalseStartBehaviour copyWith(void Function(FalseStartBehaviour) updates) => super.copyWith((message) => updates(message as FalseStartBehaviour)) as FalseStartBehaviour;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static FalseStartBehaviour create() => FalseStartBehaviour._();
-  FalseStartBehaviour createEmptyInstance() => create();
-  static $pb.PbList<FalseStartBehaviour> createRepeated() => $pb.PbList<FalseStartBehaviour>();
-  @$core.pragma('dart2js:noInline')
-  static FalseStartBehaviour getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FalseStartBehaviour>(create);
-  static FalseStartBehaviour? _defaultInstance;
-
-  FalseStartBehaviour_Behaviour whichBehaviour() => _FalseStartBehaviour_BehaviourByTag[$_whichOneof(0)]!;
-  void clearBehaviour() => clearField($_whichOneof(0));
-
-  @$pb.TagNumber(1)
-  AbortAfterFalseStart get abortAfterFalseStart => $_getN(0);
-  @$pb.TagNumber(1)
-  set abortAfterFalseStart(AbortAfterFalseStart v) { setField(1, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasAbortAfterFalseStart() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearAbortAfterFalseStart() => clearField(1);
-  @$pb.TagNumber(1)
-  AbortAfterFalseStart ensureAbortAfterFalseStart() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  ContinueAfterFalseStart get continueAfterFalseStart => $_getN(1);
-  @$pb.TagNumber(2)
-  set continueAfterFalseStart(ContinueAfterFalseStart v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasContinueAfterFalseStart() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearContinueAfterFalseStart() => clearField(2);
-  @$pb.TagNumber(2)
-  ContinueAfterFalseStart ensureContinueAfterFalseStart() => $_ensure(1);
-}
-
 class FalseStartSettings extends $pb.GeneratedMessage {
   factory FalseStartSettings({
-    FalseStartBehaviour? behaviour,
+  @$core.Deprecated('This field is deprecated.')
+    $0.FalseStartBehaviour? behaviour,
     $core.int? soundDuration,
+    $core.int? assumedReactionTime,
   }) {
     final $result = create();
     if (behaviour != null) {
+      // ignore: deprecated_member_use_from_same_package
       $result.behaviour = behaviour;
     }
     if (soundDuration != null) {
       $result.soundDuration = soundDuration;
+    }
+    if (assumedReactionTime != null) {
+      $result.assumedReactionTime = assumedReactionTime;
     }
     return $result;
   }
@@ -680,8 +521,9 @@ class FalseStartSettings extends $pb.GeneratedMessage {
   factory FalseStartSettings.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FalseStartSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..aOM<FalseStartBehaviour>(1, _omitFieldNames ? '' : 'behaviour', subBuilder: FalseStartBehaviour.create)
+    ..aOM<$0.FalseStartBehaviour>(1, _omitFieldNames ? '' : 'behaviour', subBuilder: $0.FalseStartBehaviour.create)
     ..a<$core.int>(2, _omitFieldNames ? '' : 'soundDuration', $pb.PbFieldType.OU3, protoName: 'soundDuration')
+    ..a<$core.int>(3, _omitFieldNames ? '' : 'assumedReactionTime', $pb.PbFieldType.OU3, protoName: 'assumedReactionTime')
     ..hasRequiredFields = false
   ;
 
@@ -706,16 +548,27 @@ class FalseStartSettings extends $pb.GeneratedMessage {
   static FalseStartSettings getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FalseStartSettings>(create);
   static FalseStartSettings? _defaultInstance;
 
+  /// DEPRECATED, just kept for compatibility with version <= 1.2.0.
+  /// ContinueAfterFalseStart is now the default and cannot be disabled.
+  /// For ContinueAfterFalseStart.assumedReactionTime use FalseStartSettings.assumedReactionTime instead.
+  /// For ContinueAfterFalseStart.continueStartSequenceAfterFalseStart use TrainingClassicRaceMode
+  /// Will be ignored when TrainingClassicRaceMode.round is set and converted to TrainingClassicRaceMode.round and FalseStartSettings.assumedReactionTime otherwise.
+  /// For backwards compatibility, this is always set when reading the settings.
+  @$core.Deprecated('This field is deprecated.')
   @$pb.TagNumber(1)
-  FalseStartBehaviour get behaviour => $_getN(0);
+  $0.FalseStartBehaviour get behaviour => $_getN(0);
+  @$core.Deprecated('This field is deprecated.')
   @$pb.TagNumber(1)
-  set behaviour(FalseStartBehaviour v) { setField(1, v); }
+  set behaviour($0.FalseStartBehaviour v) { setField(1, v); }
+  @$core.Deprecated('This field is deprecated.')
   @$pb.TagNumber(1)
   $core.bool hasBehaviour() => $_has(0);
+  @$core.Deprecated('This field is deprecated.')
   @$pb.TagNumber(1)
   void clearBehaviour() => clearField(1);
+  @$core.Deprecated('This field is deprecated.')
   @$pb.TagNumber(1)
-  FalseStartBehaviour ensureBehaviour() => $_ensure(0);
+  $0.FalseStartBehaviour ensureBehaviour() => $_ensure(0);
 
   /// The duration in milliseconds the false start sound will be played before it
   /// is automatically muted. Maximum value is 60000, default value is 2000.
@@ -727,6 +580,18 @@ class FalseStartSettings extends $pb.GeneratedMessage {
   $core.bool hasSoundDuration() => $_has(1);
   @$pb.TagNumber(2)
   void clearSoundDuration() => clearField(2);
+
+  /// This time will be assumed as the reaction time when calculating the final
+  /// time. Maximum value is 10000, default value is 100.
+  /// Added in 1.3.0, older versions should use behaviour.continueAfterFalseStart.assumedReactionTime instead.
+  @$pb.TagNumber(3)
+  $core.int get assumedReactionTime => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set assumedReactionTime($core.int v) { $_setUnsignedInt32(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasAssumedReactionTime() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAssumedReactionTime() => clearField(3);
 }
 
 class IndicatorSettings extends $pb.GeneratedMessage {
@@ -819,6 +684,7 @@ class TrainingClassicRaceMode extends $pb.GeneratedMessage {
     $core.Iterable<LaneSettings>? lanes,
     FalseStartSettings? falseStartSettings,
     IndicatorSettings? indicatorSettings,
+    CompetitionRound? round,
   }) {
     final $result = create();
     if (startProcedure != null) {
@@ -833,6 +699,9 @@ class TrainingClassicRaceMode extends $pb.GeneratedMessage {
     if (indicatorSettings != null) {
       $result.indicatorSettings = indicatorSettings;
     }
+    if (round != null) {
+      $result.round = round;
+    }
     return $result;
   }
   TrainingClassicRaceMode._() : super();
@@ -844,6 +713,7 @@ class TrainingClassicRaceMode extends $pb.GeneratedMessage {
     ..pc<LaneSettings>(2, _omitFieldNames ? '' : 'lanes', $pb.PbFieldType.PM, subBuilder: LaneSettings.create)
     ..aOM<FalseStartSettings>(3, _omitFieldNames ? '' : 'falseStartSettings', protoName: 'falseStartSettings', subBuilder: FalseStartSettings.create)
     ..aOM<IndicatorSettings>(4, _omitFieldNames ? '' : 'indicatorSettings', protoName: 'indicatorSettings', subBuilder: IndicatorSettings.create)
+    ..e<CompetitionRound>(5, _omitFieldNames ? '' : 'round', $pb.PbFieldType.OE, defaultOrMaker: CompetitionRound.UNSPECIFIED, valueOf: CompetitionRound.valueOf, enumValues: CompetitionRound.values)
     ..hasRequiredFields = false
   ;
 
@@ -904,11 +774,143 @@ class TrainingClassicRaceMode extends $pb.GeneratedMessage {
   void clearIndicatorSettings() => clearField(4);
   @$pb.TagNumber(4)
   IndicatorSettings ensureIndicatorSettings() => $_ensure(3);
+
+  /// Added in 1.3.0, older versions should use deprecated AbortAfterFalseStart or ContinueAfterFalseStart instead.
+  @$pb.TagNumber(5)
+  CompetitionRound get round => $_getN(4);
+  @$pb.TagNumber(5)
+  set round(CompetitionRound v) { setField(5, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasRound() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearRound() => clearField(5);
+}
+
+class CompetitionRelayMode extends $pb.GeneratedMessage {
+  factory CompetitionRelayMode({
+    ManualStartProcedure? manualStartProcedure,
+    CompetitionRound? round,
+  }) {
+    final $result = create();
+    if (manualStartProcedure != null) {
+      $result.manualStartProcedure = manualStartProcedure;
+    }
+    if (round != null) {
+      $result.round = round;
+    }
+    return $result;
+  }
+  CompetitionRelayMode._() : super();
+  factory CompetitionRelayMode.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CompetitionRelayMode.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CompetitionRelayMode', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
+    ..aOM<ManualStartProcedure>(1, _omitFieldNames ? '' : 'manualStartProcedure', protoName: 'manualStartProcedure', subBuilder: ManualStartProcedure.create)
+    ..e<CompetitionRound>(2, _omitFieldNames ? '' : 'round', $pb.PbFieldType.OE, defaultOrMaker: CompetitionRound.UNSPECIFIED, valueOf: CompetitionRound.valueOf, enumValues: CompetitionRound.values)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  CompetitionRelayMode clone() => CompetitionRelayMode()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  CompetitionRelayMode copyWith(void Function(CompetitionRelayMode) updates) => super.copyWith((message) => updates(message as CompetitionRelayMode)) as CompetitionRelayMode;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CompetitionRelayMode create() => CompetitionRelayMode._();
+  CompetitionRelayMode createEmptyInstance() => create();
+  static $pb.PbList<CompetitionRelayMode> createRepeated() => $pb.PbList<CompetitionRelayMode>();
+  @$core.pragma('dart2js:noInline')
+  static CompetitionRelayMode getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CompetitionRelayMode>(create);
+  static CompetitionRelayMode? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ManualStartProcedure get manualStartProcedure => $_getN(0);
+  @$pb.TagNumber(1)
+  set manualStartProcedure(ManualStartProcedure v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasManualStartProcedure() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearManualStartProcedure() => clearField(1);
+  @$pb.TagNumber(1)
+  ManualStartProcedure ensureManualStartProcedure() => $_ensure(0);
+
+  /// Added in 1.3.0
+  @$pb.TagNumber(2)
+  CompetitionRound get round => $_getN(1);
+  @$pb.TagNumber(2)
+  set round(CompetitionRound v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasRound() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearRound() => clearField(2);
+}
+
+class TrainingStartOnReleaseMode extends $pb.GeneratedMessage {
+  factory TrainingStartOnReleaseMode({
+    IndicatorSettings? indicatorSettings,
+  }) {
+    final $result = create();
+    if (indicatorSettings != null) {
+      $result.indicatorSettings = indicatorSettings;
+    }
+    return $result;
+  }
+  TrainingStartOnReleaseMode._() : super();
+  factory TrainingStartOnReleaseMode.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TrainingStartOnReleaseMode.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TrainingStartOnReleaseMode', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
+    ..aOM<IndicatorSettings>(1, _omitFieldNames ? '' : 'indicatorSettings', protoName: 'indicatorSettings', subBuilder: IndicatorSettings.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  TrainingStartOnReleaseMode clone() => TrainingStartOnReleaseMode()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TrainingStartOnReleaseMode copyWith(void Function(TrainingStartOnReleaseMode) updates) => super.copyWith((message) => updates(message as TrainingStartOnReleaseMode)) as TrainingStartOnReleaseMode;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static TrainingStartOnReleaseMode create() => TrainingStartOnReleaseMode._();
+  TrainingStartOnReleaseMode createEmptyInstance() => create();
+  static $pb.PbList<TrainingStartOnReleaseMode> createRepeated() => $pb.PbList<TrainingStartOnReleaseMode>();
+  @$core.pragma('dart2js:noInline')
+  static TrainingStartOnReleaseMode getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TrainingStartOnReleaseMode>(create);
+  static TrainingStartOnReleaseMode? _defaultInstance;
+
+  /// indicatorSettings.turnOffWhenFalseStartSoundIsMuted will be ignored in this mode.
+  @$pb.TagNumber(1)
+  IndicatorSettings get indicatorSettings => $_getN(0);
+  @$pb.TagNumber(1)
+  set indicatorSettings(IndicatorSettings v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasIndicatorSettings() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIndicatorSettings() => clearField(1);
+  @$pb.TagNumber(1)
+  IndicatorSettings ensureIndicatorSettings() => $_ensure(0);
 }
 
 enum StopwatchSettings_Mode {
   competitionClassicRaceMode, 
   trainingClassicRaceMode, 
+  competitionRelayMode, 
+  trainingStartOnReleaseMode, 
   notSet
 }
 
@@ -916,6 +918,8 @@ class StopwatchSettings extends $pb.GeneratedMessage {
   factory StopwatchSettings({
     CompetitionClassicRaceMode? competitionClassicRaceMode,
     TrainingClassicRaceMode? trainingClassicRaceMode,
+    CompetitionRelayMode? competitionRelayMode,
+    TrainingStartOnReleaseMode? trainingStartOnReleaseMode,
   }) {
     final $result = create();
     if (competitionClassicRaceMode != null) {
@@ -923,6 +927,12 @@ class StopwatchSettings extends $pb.GeneratedMessage {
     }
     if (trainingClassicRaceMode != null) {
       $result.trainingClassicRaceMode = trainingClassicRaceMode;
+    }
+    if (competitionRelayMode != null) {
+      $result.competitionRelayMode = competitionRelayMode;
+    }
+    if (trainingStartOnReleaseMode != null) {
+      $result.trainingStartOnReleaseMode = trainingStartOnReleaseMode;
     }
     return $result;
   }
@@ -933,12 +943,16 @@ class StopwatchSettings extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, StopwatchSettings_Mode> _StopwatchSettings_ModeByTag = {
     1 : StopwatchSettings_Mode.competitionClassicRaceMode,
     2 : StopwatchSettings_Mode.trainingClassicRaceMode,
+    3 : StopwatchSettings_Mode.competitionRelayMode,
+    4 : StopwatchSettings_Mode.trainingStartOnReleaseMode,
     0 : StopwatchSettings_Mode.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StopwatchSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw'), createEmptyInstance: create)
-    ..oo(0, [1, 2])
+    ..oo(0, [1, 2, 3, 4])
     ..aOM<CompetitionClassicRaceMode>(1, _omitFieldNames ? '' : 'competitionClassicRaceMode', protoName: 'competitionClassicRaceMode', subBuilder: CompetitionClassicRaceMode.create)
     ..aOM<TrainingClassicRaceMode>(2, _omitFieldNames ? '' : 'trainingClassicRaceMode', protoName: 'trainingClassicRaceMode', subBuilder: TrainingClassicRaceMode.create)
+    ..aOM<CompetitionRelayMode>(3, _omitFieldNames ? '' : 'competitionRelayMode', protoName: 'competitionRelayMode', subBuilder: CompetitionRelayMode.create)
+    ..aOM<TrainingStartOnReleaseMode>(4, _omitFieldNames ? '' : 'trainingStartOnReleaseMode', protoName: 'trainingStartOnReleaseMode', subBuilder: TrainingStartOnReleaseMode.create)
     ..hasRequiredFields = false
   ;
 
@@ -987,6 +1001,28 @@ class StopwatchSettings extends $pb.GeneratedMessage {
   void clearTrainingClassicRaceMode() => clearField(2);
   @$pb.TagNumber(2)
   TrainingClassicRaceMode ensureTrainingClassicRaceMode() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  CompetitionRelayMode get competitionRelayMode => $_getN(2);
+  @$pb.TagNumber(3)
+  set competitionRelayMode(CompetitionRelayMode v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasCompetitionRelayMode() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCompetitionRelayMode() => clearField(3);
+  @$pb.TagNumber(3)
+  CompetitionRelayMode ensureCompetitionRelayMode() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  TrainingStartOnReleaseMode get trainingStartOnReleaseMode => $_getN(3);
+  @$pb.TagNumber(4)
+  set trainingStartOnReleaseMode(TrainingStartOnReleaseMode v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasTrainingStartOnReleaseMode() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTrainingStartOnReleaseMode() => clearField(4);
+  @$pb.TagNumber(4)
+  TrainingStartOnReleaseMode ensureTrainingStartOnReleaseMode() => $_ensure(3);
 }
 
 class Settings extends $pb.GeneratedMessage {

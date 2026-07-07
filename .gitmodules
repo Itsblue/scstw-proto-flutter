@@ -1,6 +1,3 @@
-[submodule "scstw-proto"]
-	path = scstw-proto
-	url = git@github.com:Itsblue/scstw-proto.git
 [submodule "lib/proto"]
 	path = lib/proto
 	url = git@github.com:Itsblue/scstw-proto.git

@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: RaceSettings.proto
+//  source: deprecated/Settings.proto
 //
 // @dart = 2.12
 
@@ -13,13 +13,14 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+/// deprecated in v1.1.0
 class ManualStartProcedureSettings extends $pb.GeneratedMessage {
   factory ManualStartProcedureSettings() => create();
   ManualStartProcedureSettings._() : super();
   factory ManualStartProcedureSettings.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ManualStartProcedureSettings.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ManualStartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated.race_settings'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ManualStartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
@@ -45,6 +46,7 @@ class ManualStartProcedureSettings extends $pb.GeneratedMessage {
   static ManualStartProcedureSettings? _defaultInstance;
 }
 
+/// deprecated in v1.1.0
 class AutomatedStartProcedureSettings extends $pb.GeneratedMessage {
   factory AutomatedStartProcedureSettings({
     $core.bool? sayReady,
@@ -63,7 +65,7 @@ class AutomatedStartProcedureSettings extends $pb.GeneratedMessage {
   factory AutomatedStartProcedureSettings.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory AutomatedStartProcedureSettings.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AutomatedStartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated.race_settings'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AutomatedStartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
     ..aOB(1, _omitFieldNames ? '' : 'sayReady', protoName: 'sayReady')
     ..a<$core.int>(2, _omitFieldNames ? '' : 'standstillDurationBeforeReady', $pb.PbFieldType.O3, protoName: 'standstillDurationBeforeReady')
     ..hasRequiredFields = false
@@ -115,6 +117,7 @@ enum StartProcedureSettings_StartProcedureSettings {
   notSet
 }
 
+/// deprecated in v1.1.0
 class StartProcedureSettings extends $pb.GeneratedMessage {
   factory StartProcedureSettings({
     ManualStartProcedureSettings? manualStartProcedureSettings,
@@ -138,7 +141,7 @@ class StartProcedureSettings extends $pb.GeneratedMessage {
     2 : StartProcedureSettings_StartProcedureSettings.automatedStartProcedureSettings,
     0 : StartProcedureSettings_StartProcedureSettings.notSet
   };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated.race_settings'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StartProcedureSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
     ..oo(0, [1, 2])
     ..aOM<ManualStartProcedureSettings>(1, _omitFieldNames ? '' : 'manualStartProcedureSettings', protoName: 'manualStartProcedureSettings', subBuilder: ManualStartProcedureSettings.create)
     ..aOM<AutomatedStartProcedureSettings>(2, _omitFieldNames ? '' : 'automatedStartProcedureSettings', protoName: 'automatedStartProcedureSettings', subBuilder: AutomatedStartProcedureSettings.create)
@@ -192,6 +195,7 @@ class StartProcedureSettings extends $pb.GeneratedMessage {
   AutomatedStartProcedureSettings ensureAutomatedStartProcedureSettings() => $_ensure(1);
 }
 
+/// deprecated in v1.1.0
 class RaceSettings extends $pb.GeneratedMessage {
   factory RaceSettings({
     StartProcedureSettings? startProcedure,
@@ -206,7 +210,7 @@ class RaceSettings extends $pb.GeneratedMessage {
   factory RaceSettings.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory RaceSettings.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RaceSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated.race_settings'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RaceSettings', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
     ..aOM<StartProcedureSettings>(1, _omitFieldNames ? '' : 'startProcedure', protoName: 'startProcedure', subBuilder: StartProcedureSettings.create)
     ..hasRequiredFields = false
   ;
@@ -242,6 +246,192 @@ class RaceSettings extends $pb.GeneratedMessage {
   void clearStartProcedure() => clearField(1);
   @$pb.TagNumber(1)
   StartProcedureSettings ensureStartProcedure() => $_ensure(0);
+}
+
+/// deprecated in v1.3.0
+class AbortAfterFalseStart extends $pb.GeneratedMessage {
+  factory AbortAfterFalseStart() => create();
+  AbortAfterFalseStart._() : super();
+  factory AbortAfterFalseStart.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AbortAfterFalseStart.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AbortAfterFalseStart', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  AbortAfterFalseStart clone() => AbortAfterFalseStart()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  AbortAfterFalseStart copyWith(void Function(AbortAfterFalseStart) updates) => super.copyWith((message) => updates(message as AbortAfterFalseStart)) as AbortAfterFalseStart;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AbortAfterFalseStart create() => AbortAfterFalseStart._();
+  AbortAfterFalseStart createEmptyInstance() => create();
+  static $pb.PbList<AbortAfterFalseStart> createRepeated() => $pb.PbList<AbortAfterFalseStart>();
+  @$core.pragma('dart2js:noInline')
+  static AbortAfterFalseStart getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AbortAfterFalseStart>(create);
+  static AbortAfterFalseStart? _defaultInstance;
+}
+
+/// deprecated in v1.3.0
+class ContinueAfterFalseStart extends $pb.GeneratedMessage {
+  factory ContinueAfterFalseStart({
+    $core.int? assumedReactionTime,
+    $core.bool? continueStartSequenceAfterFalseStart,
+  }) {
+    final $result = create();
+    if (assumedReactionTime != null) {
+      $result.assumedReactionTime = assumedReactionTime;
+    }
+    if (continueStartSequenceAfterFalseStart != null) {
+      $result.continueStartSequenceAfterFalseStart = continueStartSequenceAfterFalseStart;
+    }
+    return $result;
+  }
+  ContinueAfterFalseStart._() : super();
+  factory ContinueAfterFalseStart.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ContinueAfterFalseStart.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ContinueAfterFalseStart', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'assumedReactionTime', $pb.PbFieldType.OU3, protoName: 'assumedReactionTime')
+    ..aOB(2, _omitFieldNames ? '' : 'continueStartSequenceAfterFalseStart', protoName: 'continueStartSequenceAfterFalseStart')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ContinueAfterFalseStart clone() => ContinueAfterFalseStart()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ContinueAfterFalseStart copyWith(void Function(ContinueAfterFalseStart) updates) => super.copyWith((message) => updates(message as ContinueAfterFalseStart)) as ContinueAfterFalseStart;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ContinueAfterFalseStart create() => ContinueAfterFalseStart._();
+  ContinueAfterFalseStart createEmptyInstance() => create();
+  static $pb.PbList<ContinueAfterFalseStart> createRepeated() => $pb.PbList<ContinueAfterFalseStart>();
+  @$core.pragma('dart2js:noInline')
+  static ContinueAfterFalseStart getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ContinueAfterFalseStart>(create);
+  static ContinueAfterFalseStart? _defaultInstance;
+
+  /// This time will be assumed as the reaction time when calculating the final
+  /// time. Maximum value is 10000, default value is 100.
+  @$pb.TagNumber(1)
+  $core.int get assumedReactionTime => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set assumedReactionTime($core.int v) { $_setUnsignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasAssumedReactionTime() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAssumedReactionTime() => clearField(1);
+
+  /// If set to true, there will be no false start tone and the normal tone will
+  /// continue. Also, the indicator of wildcard lanes will continue as normal.
+  @$pb.TagNumber(2)
+  $core.bool get continueStartSequenceAfterFalseStart => $_getBF(1);
+  @$pb.TagNumber(2)
+  set continueStartSequenceAfterFalseStart($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasContinueStartSequenceAfterFalseStart() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearContinueStartSequenceAfterFalseStart() => clearField(2);
+}
+
+enum FalseStartBehaviour_Behaviour {
+  abortAfterFalseStart, 
+  continueAfterFalseStart, 
+  notSet
+}
+
+/// deprecated in v1.3.0
+class FalseStartBehaviour extends $pb.GeneratedMessage {
+  factory FalseStartBehaviour({
+    AbortAfterFalseStart? abortAfterFalseStart,
+    ContinueAfterFalseStart? continueAfterFalseStart,
+  }) {
+    final $result = create();
+    if (abortAfterFalseStart != null) {
+      $result.abortAfterFalseStart = abortAfterFalseStart;
+    }
+    if (continueAfterFalseStart != null) {
+      $result.continueAfterFalseStart = continueAfterFalseStart;
+    }
+    return $result;
+  }
+  FalseStartBehaviour._() : super();
+  factory FalseStartBehaviour.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FalseStartBehaviour.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static const $core.Map<$core.int, FalseStartBehaviour_Behaviour> _FalseStartBehaviour_BehaviourByTag = {
+    1 : FalseStartBehaviour_Behaviour.abortAfterFalseStart,
+    2 : FalseStartBehaviour_Behaviour.continueAfterFalseStart,
+    0 : FalseStartBehaviour_Behaviour.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FalseStartBehaviour', package: const $pb.PackageName(_omitMessageNames ? '' : 'ScStw.deprecated'), createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<AbortAfterFalseStart>(1, _omitFieldNames ? '' : 'abortAfterFalseStart', protoName: 'abortAfterFalseStart', subBuilder: AbortAfterFalseStart.create)
+    ..aOM<ContinueAfterFalseStart>(2, _omitFieldNames ? '' : 'continueAfterFalseStart', protoName: 'continueAfterFalseStart', subBuilder: ContinueAfterFalseStart.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FalseStartBehaviour clone() => FalseStartBehaviour()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FalseStartBehaviour copyWith(void Function(FalseStartBehaviour) updates) => super.copyWith((message) => updates(message as FalseStartBehaviour)) as FalseStartBehaviour;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FalseStartBehaviour create() => FalseStartBehaviour._();
+  FalseStartBehaviour createEmptyInstance() => create();
+  static $pb.PbList<FalseStartBehaviour> createRepeated() => $pb.PbList<FalseStartBehaviour>();
+  @$core.pragma('dart2js:noInline')
+  static FalseStartBehaviour getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FalseStartBehaviour>(create);
+  static FalseStartBehaviour? _defaultInstance;
+
+  FalseStartBehaviour_Behaviour whichBehaviour() => _FalseStartBehaviour_BehaviourByTag[$_whichOneof(0)]!;
+  void clearBehaviour() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  AbortAfterFalseStart get abortAfterFalseStart => $_getN(0);
+  @$pb.TagNumber(1)
+  set abortAfterFalseStart(AbortAfterFalseStart v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasAbortAfterFalseStart() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAbortAfterFalseStart() => clearField(1);
+  @$pb.TagNumber(1)
+  AbortAfterFalseStart ensureAbortAfterFalseStart() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  ContinueAfterFalseStart get continueAfterFalseStart => $_getN(1);
+  @$pb.TagNumber(2)
+  set continueAfterFalseStart(ContinueAfterFalseStart v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasContinueAfterFalseStart() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearContinueAfterFalseStart() => clearField(2);
+  @$pb.TagNumber(2)
+  ContinueAfterFalseStart ensureContinueAfterFalseStart() => $_ensure(1);
 }
 
 

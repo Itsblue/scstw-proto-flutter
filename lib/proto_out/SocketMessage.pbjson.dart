@@ -20,6 +20,7 @@ const SocketMessage$json = {
     {'1': 'raceFullState', '3': 1, '4': 1, '5': 11, '6': '.ScStw.RaceFullState', '9': 0, '10': 'raceFullState'},
     {'1': 'command', '3': 2, '4': 1, '5': 11, '6': '.ScStw.Command', '9': 0, '10': 'command'},
     {'1': 'settings', '3': 3, '4': 1, '5': 11, '6': '.ScStw.Settings', '9': 0, '10': 'settings'},
+    {'1': 'systemInfo', '3': 4, '4': 1, '5': 11, '6': '.ScStw.SystemInfo', '9': 0, '10': 'systemInfo'},
   ],
   '8': [
     {'1': 'message'},
@@ -31,5 +32,6 @@ final $typed_data.Uint8List socketMessageDescriptor = $convert.base64Decode(
     'Cg1Tb2NrZXRNZXNzYWdlEjwKDXJhY2VGdWxsU3RhdGUYASABKAsyFC5TY1N0dy5SYWNlRnVsbF'
     'N0YXRlSABSDXJhY2VGdWxsU3RhdGUSKgoHY29tbWFuZBgCIAEoCzIOLlNjU3R3LkNvbW1hbmRI'
     'AFIHY29tbWFuZBItCghzZXR0aW5ncxgDIAEoCzIPLlNjU3R3LlNldHRpbmdzSABSCHNldHRpbm'
-    'dzQgkKB21lc3NhZ2U=');
+    'dzEjMKCnN5c3RlbUluZm8YBCABKAsyES5TY1N0dy5TeXN0ZW1JbmZvSABSCnN5c3RlbUluZm9C'
+    'CQoHbWVzc2FnZQ==');
 

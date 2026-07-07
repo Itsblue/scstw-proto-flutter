@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: RaceSettings.proto
+//  source: SystemInfo.proto
 //
 // @dart = 2.12
 

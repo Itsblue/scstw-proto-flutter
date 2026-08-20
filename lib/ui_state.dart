@@ -67,16 +67,25 @@ class UIState {
   Duration? stopwatchDuration;
   double? autostartProgress;
   int availableRaceActions = 0;
+  bool atYourMarks = false;
 
-  void Function()? onResetPressed = () {};
-  void Function()? onReadyPressed = () {};
-  void Function()? onAtYourMarksPressed = () {};
-  void Function()? onMutePressed = () {};
+  void Function()? onResetPressed;
+  void Function()? onReadyPressed;
+  void Function()? onAtYourMarksPressed;
+  void Function()? onMutePressed;
 }
 
 class UIStateController {
   final logger = Logger();
   final BaseStationConnection _connection;
+  final bool allowReset;
+  final bool allowReady;
+
+  /// Overrides competition-mode detection when the caller already owns it.
+  /// When omitted, competition classic and relay modes are treated as
+  /// competition modes.
+  final bool? competitionMode;
+
   UIState lastUIState = UIState();
   Settings _settings = Settings();
   final LaneTimer _timer = LaneTimer();
@@ -181,13 +190,27 @@ class UIStateController {
     Settings settings,
   ) {
     int availableActions = 0;
-    if ([
-      RaceFullState_State.IDLE,
-      RaceFullState_State.IDLE_CLEAR_TO_START,
-    ].contains(raceFullState.state)) {
-      availableActions |= RaceActions.READY.value;
-    } else {
-      availableActions |= RaceActions.RESET.value;
+
+    switch (raceFullState.state) {
+      case RaceFullState_State.IDLE:
+      case RaceFullState_State.IDLE_CLEAR_TO_START:
+        if (allowReady) {
+          availableActions |= RaceActions.READY.value;
+        }
+        break;
+      case RaceFullState_State.RUNNING:
+        if (allowReset && !_isCompetitionMode(settings)) {
+          availableActions |= RaceActions.RESET.value;
+        }
+        break;
+      case RaceFullState_State.FINISHED:
+      case RaceFullState_State.FINISHED_MUTED:
+        if (allowReset) {
+          availableActions |= RaceActions.RESET.value;
+        }
+        break;
+      case RaceFullState_State.STARTING:
+        break;
     }
 
     if (features.command.sayAtYourMarks &&
@@ -207,31 +230,31 @@ class UIStateController {
     lastUIState.availableRaceActions = availableActions;
   }
 
+  bool _isCompetitionMode(Settings settings) {
+    return competitionMode ??
+        (settings.stopwatchSettings.hasCompetitionClassicRaceMode() ||
+            settings.stopwatchSettings.hasCompetitionRelayMode());
+  }
+
   void _computeOnPressedFunctions(
     RaceFullState raceFullState,
-    Settings settings,
     int availableActions,
   ) {
     lastUIState.onResetPressed =
-        !(([
-                  RaceFullState_State.FINISHED,
-                  RaceFullState_State.FINISHED_MUTED,
-                ]).contains(raceFullState.state) ||
-                (raceFullState.state == RaceFullState_State.RUNNING &&
-                    settings.stopwatchSettings.hasTrainingClassicRaceMode()))
-            ? null
-            : () {
+        availableActions.has(RaceActions.RESET)
+            ? () {
               _connection.sendCommand(Command(reset: RaceResetCommand()));
-            };
+              lastUIState.atYourMarks = false;
+              _uiStateController.add(lastUIState);
+            }
+            : null;
 
     lastUIState.onReadyPressed =
-        !((RaceFullState_State.IDLE_CLEAR_TO_START == raceFullState.state) ||
-                (raceFullState.state == RaceFullState_State.IDLE &&
-                    settings.stopwatchSettings.hasCompetitionClassicRaceMode()))
-            ? null
-            : () {
+        availableActions.has(RaceActions.READY)
+            ? () {
               _connection.sendCommand(Command(start: RaceStartCommand()));
-            };
+            }
+            : null;
 
     lastUIState.onAtYourMarksPressed =
         availableActions.has(RaceActions.AT_YOUR_MARKS)
@@ -239,15 +262,12 @@ class UIStateController {
               _connection.sendCommand(
                 Command(sayAtYourMarks: SayAtYourMarksCommand()),
               );
+              lastUIState.atYourMarks = true;
               lastUIState.onAtYourMarksPressed =
                   null; // Disable the button after pressing
               _uiStateController.add(lastUIState);
               Future.delayed(Duration(milliseconds: 1100), () {
-                _computeOnPressedFunctions(
-                  raceFullState,
-                  settings,
-                  availableActions,
-                );
+                _computeOnPressedFunctions(raceFullState, availableActions);
                 _uiStateController.add(lastUIState);
               });
             }
@@ -270,9 +290,14 @@ class UIStateController {
     Iterable<LaneFullState?> otherLaneStates,
   ) {
     int availableActions = 0;
-    if (laneFullState.state == LaneFullState_State.IDLE) {
+    final isStartOnReleaseMode =
+        lastUIState.settings.stopwatchSettings.hasTrainingStartOnReleaseMode();
+
+    if (laneFullState.state == LaneFullState_State.IDLE &&
+        !isStartOnReleaseMode) {
       availableActions |= LaneActions.DISABLE_LANE.value;
-    } else if (laneFullState.state == LaneFullState_State.RUNNING) {
+    } else if (laneFullState.state == LaneFullState_State.RUNNING &&
+        !isStartOnReleaseMode) {
       availableActions |= LaneActions.FALL.value;
     } else if (laneFullState.state == LaneFullState_State.DISABLED &&
         (raceState == RaceFullState_State.IDLE ||
@@ -558,11 +583,7 @@ class UIStateController {
     lastUIState.laneStates = nextLaneStates;
     _handleAutostartProgress(raceFullState, lastUIState.settings);
     _computeAvailableRaceActions(raceFullState, lastUIState.settings);
-    _computeOnPressedFunctions(
-      raceFullState,
-      lastUIState.settings,
-      lastUIState.availableRaceActions,
-    );
+    _computeOnPressedFunctions(raceFullState, lastUIState.availableRaceActions);
     _handleRaceStateChange(raceFullState);
 
     _uiStateController.add(lastUIState);
@@ -586,7 +607,12 @@ class UIStateController {
     lastUIState.settings = settingsMiddleware(_settings, _version);
   }
 
-  UIStateController(this._connection) {
+  UIStateController(
+    this._connection, {
+    this.allowReset = true,
+    this.allowReady = true,
+    this.competitionMode,
+  }) {
     // Setting must be listened on first because, such that the version can be determined
     _connection.onSystemInfo.listen((systemInfo) {
       _onSystemInfo(systemInfo);

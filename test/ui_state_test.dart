@@ -15,6 +15,7 @@ class FakeBaseStationConnection implements BaseStationConnection {
   final _raceStateController = StreamController<RaceFullState>.broadcast();
   final _settingsController = StreamController<Settings>.broadcast();
   final _systemInfoController = StreamController<SystemInfo>.broadcast();
+  final sentCommands = <Command>[];
 
   void emitRaceState(RaceFullState raceState) {
     _raceStateController.add(raceState);
@@ -56,7 +57,9 @@ class FakeBaseStationConnection implements BaseStationConnection {
   void scan(Function(List<ScanResult>) onScanResult) {}
 
   @override
-  Future<void> sendCommand(Command command) async {}
+  Future<void> sendCommand(Command command) async {
+    sentCommands.add(command);
+  }
 
   @override
   Future<void> sendSettings(Settings settings) async {}
@@ -69,6 +72,13 @@ RaceFullState _raceStateWithLanes(int laneCount) {
       laneCount,
       (_) => LaneFullState(state: LaneFullState_State.IDLE),
     ),
+  );
+}
+
+RaceFullState _raceState(RaceFullState_State state) {
+  return RaceFullState(
+    state: state,
+    laneStates: [LaneFullState(state: LaneFullState_State.IDLE)],
   );
 }
 
@@ -181,6 +191,180 @@ void main() {
     await connection.dispose();
   });
 
+  test('primary actions follow the app race-state logic', () async {
+    final connection = FakeBaseStationConnection();
+    final controller = UIStateController(connection);
+
+    connection.emitSettings(
+      Settings(
+        stopwatchSettings: StopwatchSettings(
+          trainingStartOnReleaseMode: TrainingStartOnReleaseMode(),
+        ),
+        securitySettings: SecuritySettings(),
+      ),
+    );
+    await pumpEventQueue();
+
+    for (final state in [
+      RaceFullState_State.IDLE,
+      RaceFullState_State.IDLE_CLEAR_TO_START,
+    ]) {
+      connection.emitRaceState(_raceState(state));
+      await pumpEventQueue();
+
+      expect(
+        controller.lastUIState.availableRaceActions.has(RaceActions.READY),
+        isTrue,
+      );
+      expect(controller.lastUIState.onReadyPressed, isNotNull);
+      expect(controller.lastUIState.onResetPressed, isNull);
+    }
+
+    connection.emitRaceState(_raceState(RaceFullState_State.RUNNING));
+    await pumpEventQueue();
+    expect(
+      controller.lastUIState.availableRaceActions.has(RaceActions.RESET),
+      isTrue,
+    );
+    expect(controller.lastUIState.onResetPressed, isNotNull);
+    expect(controller.lastUIState.onReadyPressed, isNull);
+
+    for (final state in [
+      RaceFullState_State.FINISHED,
+      RaceFullState_State.FINISHED_MUTED,
+    ]) {
+      connection.emitRaceState(_raceState(state));
+      await pumpEventQueue();
+
+      expect(
+        controller.lastUIState.availableRaceActions.has(RaceActions.RESET),
+        isTrue,
+      );
+      expect(controller.lastUIState.onResetPressed, isNotNull);
+      expect(controller.lastUIState.onReadyPressed, isNull);
+    }
+
+    connection.emitRaceState(_raceState(RaceFullState_State.STARTING));
+    await pumpEventQueue();
+    expect(
+      controller.lastUIState.availableRaceActions.has(RaceActions.READY),
+      isFalse,
+    );
+    expect(
+      controller.lastUIState.availableRaceActions.has(RaceActions.RESET),
+      isFalse,
+    );
+    expect(controller.lastUIState.onReadyPressed, isNull);
+    expect(controller.lastUIState.onResetPressed, isNull);
+
+    controller.dispose();
+    await connection.dispose();
+  });
+
+  test('primary actions honor allow flags and competition mode', () async {
+    final connection = FakeBaseStationConnection();
+    final controller = UIStateController(
+      connection,
+      allowReady: false,
+      allowReset: false,
+      competitionMode: false,
+    );
+
+    connection.emitSettings(
+      Settings(
+        stopwatchSettings: StopwatchSettings(
+          trainingClassicRaceMode: TrainingClassicRaceMode(),
+        ),
+        securitySettings: SecuritySettings(),
+      ),
+    );
+    await pumpEventQueue();
+
+    for (final state in [
+      RaceFullState_State.IDLE,
+      RaceFullState_State.IDLE_CLEAR_TO_START,
+      RaceFullState_State.RUNNING,
+      RaceFullState_State.FINISHED,
+      RaceFullState_State.FINISHED_MUTED,
+    ]) {
+      connection.emitRaceState(_raceState(state));
+      await pumpEventQueue();
+
+      expect(controller.lastUIState.onReadyPressed, isNull);
+      expect(controller.lastUIState.onResetPressed, isNull);
+    }
+
+    controller.dispose();
+    await connection.dispose();
+  });
+
+  test('running reset uses detected or overridden competition mode', () async {
+    final competitionConnection = FakeBaseStationConnection();
+    final competitionController = UIStateController(competitionConnection);
+    final overriddenConnection = FakeBaseStationConnection();
+    final overriddenController = UIStateController(
+      overriddenConnection,
+      competitionMode: false,
+    );
+    final competitionSettings = Settings(
+      stopwatchSettings: StopwatchSettings(
+        competitionClassicRaceMode: CompetitionClassicRaceMode(),
+      ),
+      securitySettings: SecuritySettings(),
+    );
+
+    competitionConnection.emitSettings(competitionSettings);
+    overriddenConnection.emitSettings(competitionSettings);
+    await pumpEventQueue();
+    competitionConnection.emitRaceState(
+      _raceState(RaceFullState_State.RUNNING),
+    );
+    overriddenConnection.emitRaceState(_raceState(RaceFullState_State.RUNNING));
+    await pumpEventQueue();
+
+    expect(competitionController.lastUIState.onResetPressed, isNull);
+    expect(overriddenController.lastUIState.onResetPressed, isNotNull);
+
+    competitionController.dispose();
+    overriddenController.dispose();
+    await competitionConnection.dispose();
+    await overriddenConnection.dispose();
+  });
+
+  test(
+    'primary callbacks send commands and reset at-your-marks state',
+    () async {
+      final connection = FakeBaseStationConnection();
+      final controller = UIStateController(connection);
+
+      connection.emitSettings(
+        Settings(
+          stopwatchSettings: StopwatchSettings(
+            trainingClassicRaceMode: TrainingClassicRaceMode(),
+          ),
+          securitySettings: SecuritySettings(),
+        ),
+      );
+      await pumpEventQueue();
+
+      connection.emitRaceState(_raceState(RaceFullState_State.IDLE));
+      await pumpEventQueue();
+      controller.lastUIState.onReadyPressed!();
+      expect(connection.sentCommands.last.hasStart(), isTrue);
+
+      controller.lastUIState.atYourMarks = true;
+      connection.emitRaceState(_raceState(RaceFullState_State.FINISHED));
+      await pumpEventQueue();
+      controller.lastUIState.onResetPressed!();
+
+      expect(connection.sentCommands.last.hasReset(), isTrue);
+      expect(controller.lastUIState.atYourMarks, isFalse);
+
+      controller.dispose();
+      await connection.dispose();
+    },
+  );
+
   test('running race initializes and clears the global race clock', () async {
     final connection = FakeBaseStationConnection();
     final controller = UIStateController(connection);
@@ -252,6 +436,60 @@ void main() {
       _plainText(controller.lastUIState.laneStates.single.laneTextTime),
       '0.600',
     );
+
+    controller.dispose();
+    await connection.dispose();
+  });
+
+  test('start-on-release mode hides disable and fall lane actions', () async {
+    final connection = FakeBaseStationConnection();
+    final controller = UIStateController(connection);
+
+    connection.emitSettings(
+      Settings(
+        stopwatchSettings: StopwatchSettings(
+          trainingStartOnReleaseMode: TrainingStartOnReleaseMode(),
+        ),
+        securitySettings: SecuritySettings(),
+      ),
+    );
+    await pumpEventQueue();
+
+    connection.emitRaceState(
+      RaceFullState(
+        state: RaceFullState_State.IDLE,
+        laneStates: [LaneFullState(state: LaneFullState_State.IDLE)],
+      ),
+    );
+    await pumpEventQueue();
+
+    var lane = controller.lastUIState.laneStates.single;
+    expect(lane.availableLaneActions.has(LaneActions.DISABLE_LANE), isFalse);
+    expect(lane.onDisableLanePressed, isNull);
+
+    connection.emitRaceState(
+      RaceFullState(
+        state: RaceFullState_State.RUNNING,
+        laneStates: [LaneFullState(state: LaneFullState_State.RUNNING)],
+      ),
+    );
+    await pumpEventQueue();
+
+    lane = controller.lastUIState.laneStates.single;
+    expect(lane.availableLaneActions.has(LaneActions.FALL), isFalse);
+    expect(lane.onFallPressed, isNull);
+
+    connection.emitRaceState(
+      RaceFullState(
+        state: RaceFullState_State.IDLE,
+        laneStates: [LaneFullState(state: LaneFullState_State.DISABLED)],
+      ),
+    );
+    await pumpEventQueue();
+
+    lane = controller.lastUIState.laneStates.single;
+    expect(lane.availableLaneActions.has(LaneActions.ENABLE_LANE), isTrue);
+    expect(lane.onEnableLanePressed, isNotNull);
 
     controller.dispose();
     await connection.dispose();

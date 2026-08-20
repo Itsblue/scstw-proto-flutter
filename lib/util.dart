@@ -65,6 +65,14 @@ Duration convertReactionTimeToDuration(int time) {
   return Duration(milliseconds: time - 3000);
 }
 
+/// Whether settings sent to the base station can affect the stopwatch.
+///
+/// Once the stopwatch has left [RaceFullState_State.IDLE], it must be reset
+/// before setting changes take effect.
+bool canChangeStopwatchSettings(RaceFullState_State raceState) {
+  return raceState == RaceFullState_State.IDLE;
+}
+
 String? determineVersionFromSystemInfo(SystemInfo? systemInfo) {
   if (systemInfo?.appInfo.hasVersion() == true) {
     return systemInfo!.appInfo.version;

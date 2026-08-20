@@ -1,7 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 import 'package:scstw_lib/util.dart';
 
 void main() {
+  group('canChangeStopwatchSettings', () {
+    test('allows changes only after a full reset', () {
+      expect(canChangeStopwatchSettings(RaceFullState_State.IDLE), isTrue);
+    });
+
+    for (final state in [
+      RaceFullState_State.IDLE_CLEAR_TO_START,
+      RaceFullState_State.STARTING,
+      RaceFullState_State.RUNNING,
+      RaceFullState_State.FINISHED,
+      RaceFullState_State.FINISHED_MUTED,
+    ]) {
+      test('blocks changes while the stopwatch is ${state.name}', () {
+        expect(canChangeStopwatchSettings(state), isFalse);
+      });
+    }
+  });
+
   test('determineFeatures defaults to no versioned features', () {
     final features = determineFeatures(null);
 

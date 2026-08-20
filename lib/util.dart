@@ -24,6 +24,7 @@ class BaseStationSettingsFeatures {
   final bool relayMode;
   final bool startOnReleaseMode;
   final bool raceModesRound;
+  final bool raceModesRoundFinal2026;
 
   const BaseStationSettingsFeatures({
     required this.storeAsDefault,
@@ -34,6 +35,7 @@ class BaseStationSettingsFeatures {
     required this.relayMode,
     required this.startOnReleaseMode,
     required this.raceModesRound,
+    required this.raceModesRoundFinal2026,
   });
 }
 
@@ -46,10 +48,12 @@ class BaseStationStopwatchFeatures {
 class BaseStationCommandFeatures {
   final bool sayAtYourMarks;
   final bool muteFalseStart;
+  final bool sayBackToPresentation;
 
   const BaseStationCommandFeatures({
     required this.sayAtYourMarks,
     required this.muteFalseStart,
+    required this.sayBackToPresentation,
   });
 }
 
@@ -88,6 +92,7 @@ String determineVersion(Settings settings, SystemInfo? systemInfo) {
 BaseStationFeatures determineFeatures(String? version) {
   final normalizedVersion = _normalizeVersion(version);
 
+  final has1_4_0 = _compareVersions('1.4.0', normalizedVersion) <= 0;
   final has1_3_0 = _compareVersions('1.3.0', normalizedVersion) <= 0;
   final has1_2_0 = _compareVersions('1.2.0', normalizedVersion) <= 0;
   final has1_1_0 = _compareVersions('1.1.0', normalizedVersion) <= 0;
@@ -102,11 +107,13 @@ BaseStationFeatures determineFeatures(String? version) {
       relayMode: has1_2_0,
       startOnReleaseMode: has1_2_0,
       raceModesRound: has1_3_0,
+      raceModesRoundFinal2026: has1_4_0,
     ),
     stopwatch: BaseStationStopwatchFeatures(raceStateLaneExtraState: has1_1_0),
     command: BaseStationCommandFeatures(
       sayAtYourMarks: has1_1_0,
       muteFalseStart: has1_1_0,
+      sayBackToPresentation: has1_4_0,
     ),
   );
 }

@@ -1,46 +1,44 @@
 import 'dart:async';
-import 'package:logger/logger.dart';
 
 class LaneTimer {
-  late DateTime _startTime;
+  final Stopwatch _stopwatch = Stopwatch();
+  Duration _initialElapsed = Duration.zero;
   bool _isRunning = false;
-  final Logger logger = Logger();
+  Timer? _timer;
 
-  late Timer _timer;
-
-
-  void start(Function(Duration) callback, [int updateInterval = 100]) {
-    if (_isRunning) {
-      _timer.cancel();
-    }
-
-    _startTime = DateTime.now();
+  void start(
+    void Function(Duration) callback, [
+    int updateInterval = 100,
+    Duration initialElapsed = Duration.zero,
+  ]) {
+    _timer?.cancel();
+    _initialElapsed = initialElapsed;
+    _stopwatch
+      ..reset()
+      ..start();
     _isRunning = true;
-    _timer = Timer.periodic(Duration(milliseconds: updateInterval), (Timer timer) {
-      final DateTime now = DateTime.now();
-      final Duration elapsed = now.difference(_startTime);
-      callback(elapsed);
-    });
+    _timer = Timer.periodic(
+      Duration(milliseconds: updateInterval),
+      (_) => callback(_initialElapsed + _stopwatch.elapsed),
+    );
   }
 
   void stop() {
-    if (_isRunning) {
-      _timer.cancel();
-      _isRunning = false;
-    }
-  }
-
-  void reset() {
+    _timer?.cancel();
+    _timer = null;
+    _stopwatch.stop();
     _isRunning = false;
   }
 
-  void cancel() {
-    if (_isRunning) {
-      _isRunning = false;
-      _timer.cancel();
-    }
+  void reset() {
+    stop();
+    _stopwatch.reset();
+    _initialElapsed = Duration.zero;
   }
 
+  void cancel() {
+    reset();
+  }
 
   bool get isRunning => _isRunning;
 }

@@ -16,9 +16,11 @@ void main() {
     expect(features.settings.relayMode, isFalse);
     expect(features.settings.startOnReleaseMode, isFalse);
     expect(features.settings.raceModesRound, isFalse);
+    expect(features.settings.raceModesRoundFinal2026, isFalse);
     expect(features.stopwatch.raceStateLaneExtraState, isFalse);
     expect(features.command.sayAtYourMarks, isFalse);
     expect(features.command.muteFalseStart, isFalse);
+    expect(features.command.sayBackToPresentation, isFalse);
   });
 
   test('determineFeatures handles 1.1.0 feature set', () {
@@ -32,9 +34,11 @@ void main() {
     expect(features.settings.relayMode, isFalse);
     expect(features.settings.startOnReleaseMode, isFalse);
     expect(features.settings.raceModesRound, isFalse);
+    expect(features.settings.raceModesRoundFinal2026, isFalse);
     expect(features.stopwatch.raceStateLaneExtraState, isTrue);
     expect(features.command.sayAtYourMarks, isTrue);
     expect(features.command.muteFalseStart, isTrue);
+    expect(features.command.sayBackToPresentation, isFalse);
   });
 
   test('determineFeatures handles 1.2.0 feature set with suffixes', () {
@@ -45,9 +49,11 @@ void main() {
     expect(features.settings.relayMode, isTrue);
     expect(features.settings.startOnReleaseMode, isTrue);
     expect(features.settings.raceModesRound, isFalse);
+    expect(features.settings.raceModesRoundFinal2026, isFalse);
     expect(features.stopwatch.raceStateLaneExtraState, isTrue);
     expect(features.command.sayAtYourMarks, isTrue);
     expect(features.command.muteFalseStart, isTrue);
+    expect(features.command.sayBackToPresentation, isFalse);
   });
 
   test('determineFeatures handles 1.3.0 feature set', () {
@@ -61,8 +67,28 @@ void main() {
     expect(features.settings.relayMode, isTrue);
     expect(features.settings.startOnReleaseMode, isTrue);
     expect(features.settings.raceModesRound, isTrue);
+    expect(features.settings.raceModesRoundFinal2026, isFalse);
     expect(features.stopwatch.raceStateLaneExtraState, isTrue);
     expect(features.command.sayAtYourMarks, isTrue);
     expect(features.command.muteFalseStart, isTrue);
+    expect(features.command.sayBackToPresentation, isFalse);
+  });
+
+  test('determineFeatures handles 1.4.0 feature set', () {
+    final features = determineFeatures('v1.4.0-rc.1');
+
+    expect(features.settings.storeAsDefault, isTrue);
+    expect(
+      features.settings.trainingClassicRaceModeFalseStartBehavior,
+      isFalse,
+    );
+    expect(features.settings.relayMode, isTrue);
+    expect(features.settings.startOnReleaseMode, isTrue);
+    expect(features.settings.raceModesRound, isTrue);
+    expect(features.settings.raceModesRoundFinal2026, isTrue);
+    expect(features.stopwatch.raceStateLaneExtraState, isTrue);
+    expect(features.command.sayAtYourMarks, isTrue);
+    expect(features.command.muteFalseStart, isTrue);
+    expect(features.command.sayBackToPresentation, isTrue);
   });
 }

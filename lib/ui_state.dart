@@ -10,6 +10,7 @@ import 'package:scstw_lib/proto_out/Command.pb.dart';
 import 'package:scstw_lib/proto_out/RaceState.pb.dart';
 import 'package:scstw_lib/proto_out/Settings.pb.dart';
 import 'package:scstw_lib/proto_out/SystemInfo.pb.dart';
+import 'package:scstw_lib/race_timing.dart';
 import 'package:scstw_lib/util.dart';
 
 import 'lane_timer.dart';
@@ -43,6 +44,7 @@ class UILaneState {
   LaneFullState? laneFullState;
   int availableLaneActions = 0;
   List<TextSpan> laneTextTime = [];
+  List<List<TextSpan>> laneDetailLines = [];
   String? laneSubtext;
   Color laneTextColor = Colors.red;
 
@@ -104,62 +106,45 @@ class UIStateController {
 
   Stream<UIState> get uiStateStream => _uiStateController.stream;
 
-  void _handleLaneStateChange(
-    UILaneState uiLaneState,
-    RaceFullState raceFullState,
-  ) {
-    switch (uiLaneState.laneFullState?.state) {
-      case LaneFullState_State.IDLE_FOOT_DOWN:
-        _timer.stop();
-        lastUIState.stopwatchDuration = Duration(milliseconds: 0);
-        _updateAllLaneTextTime();
-        break;
-      case LaneFullState_State.RUNNING_FOOT_DOWN:
-        if (!_timer.isRunning) {
-          _timer.start((elapsed) {
-            lastUIState.stopwatchDuration = elapsed;
-            _updateAllLaneTextTime();
-          }, 100);
-        }
-        break;
-      case LaneFullState_State.RUNNING:
-        // if (!timer.isRunning) {
-        //   timer.start((elapsed) {
-        //     lastUIState.stopwatchDuration = elapsed;
-        //     _uiStateController.add(lastUIState);
-        //   }, 10);
-        // }
-        break;
-      case LaneFullState_State.FINISHED:
-      case LaneFullState_State.FINISHED_WINNER:
-      case LaneFullState_State.FINISHED_TIE:
-        if (raceFullState.laneStates.any(
-          (laneState) =>
-              laneState.state == LaneFullState_State.RUNNING ||
-              laneState.state == LaneFullState_State.RUNNING_FOOT_DOWN,
-        )) {
-          // If there is still a lane running, we don't stop the timer
-          return;
-        } else {
-          _timer.stop();
-        }
-        break;
-      default:
-        break;
+  void _handleRaceTimerState(RaceFullState raceFullState) {
+    if (raceFullState.state == RaceFullState_State.RUNNING) {
+      if (_timer.isRunning) return;
+
+      final initialElapsed = Duration(
+        milliseconds: synchronizedRaceElapsedMilliseconds(
+          raceFullState.currentTime.toInt(),
+        ),
+      );
+      lastUIState.stopwatchDuration = initialElapsed;
+      _timer.start(
+        (elapsed) {
+          lastUIState.stopwatchDuration = elapsed;
+          _updateAllLaneTiming();
+        },
+        100,
+        initialElapsed,
+      );
+      return;
     }
+
+    _timer.stop();
+    lastUIState.stopwatchDuration = null;
   }
 
-  void _updateAllLaneTextTime() {
+  void _updateAllLaneTiming() {
     for (var laneState in lastUIState.laneStates) {
+      final laneFullState = laneState.laneFullState!;
+      final timing = calculateLaneTiming(
+        laneFullState,
+        lastUIState.stopwatchDuration,
+      );
       if (laneState.laneFullState?.state != LaneFullState_State.FINISHED &&
           laneState.laneFullState?.state !=
               LaneFullState_State.FINISHED_WINNER &&
           laneState.laneFullState?.state != LaneFullState_State.FINISHED_TIE) {
-        laneState.laneTextTime = _createLaneTextWithTime(
-          laneState.laneFullState!,
-          lastUIState.stopwatchDuration,
-        );
+        laneState.laneTextTime = _createLaneTextWithTime(laneFullState, timing);
       }
+      laneState.laneDetailLines = _createLaneDetailLines(laneFullState, timing);
     }
     _uiStateController.add(lastUIState);
   }
@@ -169,7 +154,7 @@ class UIStateController {
     Settings settings,
   ) {
     var standstillDurationBeforeStart =
-        _version == "1.0.0"
+        features.settings.stopwatch
             ? settings
                 .stopwatchSettings
                 .trainingClassicRaceMode
@@ -205,20 +190,19 @@ class UIStateController {
       availableActions |= RaceActions.RESET.value;
     }
 
-    if (_version == "1.1.0" &&
-        (raceFullState.state == RaceFullState_State.IDLE ||
-            raceFullState.state == RaceFullState_State.FINISHED &&
-                raceFullState.laneStates.any(
-                  (laneState) => [
-                    LaneFullState_State.FALSE_START,
-                    LaneFullState_State.FALSE_START_TIE,
-                  ].contains(laneState.state),
-                ))) {
-      if (raceFullState.state == RaceFullState_State.IDLE) {
-        availableActions |= RaceActions.AT_YOUR_MARKS.value;
-      } else {
-        availableActions |= RaceActions.MUTE.value;
-      }
+    if (features.command.sayAtYourMarks &&
+        raceFullState.state == RaceFullState_State.IDLE) {
+      availableActions |= RaceActions.AT_YOUR_MARKS.value;
+    }
+    if (features.command.muteFalseStart &&
+        raceFullState.state == RaceFullState_State.FINISHED &&
+        raceFullState.laneStates.any(
+          (laneState) => [
+            LaneFullState_State.FALSE_START,
+            LaneFullState_State.FALSE_START_TIE,
+          ].contains(laneState.state),
+        )) {
+      availableActions |= RaceActions.MUTE.value;
     }
     lastUIState.availableRaceActions = availableActions;
   }
@@ -249,16 +233,25 @@ class UIStateController {
               _connection.sendCommand(Command(start: RaceStartCommand()));
             };
 
-    lastUIState.onAtYourMarksPressed = () {
-      _connection.sendCommand(Command(sayAtYourMarks: SayAtYourMarksCommand()));
-      lastUIState.onAtYourMarksPressed =
-          null; // Disable the button after pressing
-      _uiStateController.add(lastUIState);
-      Future.delayed(Duration(milliseconds: 1100), () {
-        _computeOnPressedFunctions(raceFullState, settings, availableActions);
-        _uiStateController.add(lastUIState);
-      });
-    };
+    lastUIState.onAtYourMarksPressed =
+        availableActions.has(RaceActions.AT_YOUR_MARKS)
+            ? () {
+              _connection.sendCommand(
+                Command(sayAtYourMarks: SayAtYourMarksCommand()),
+              );
+              lastUIState.onAtYourMarksPressed =
+                  null; // Disable the button after pressing
+              _uiStateController.add(lastUIState);
+              Future.delayed(Duration(milliseconds: 1100), () {
+                _computeOnPressedFunctions(
+                  raceFullState,
+                  settings,
+                  availableActions,
+                );
+                _uiStateController.add(lastUIState);
+              });
+            }
+            : null;
 
     lastUIState.onMutePressed =
         availableActions.has(RaceActions.MUTE)
@@ -387,7 +380,7 @@ class UIStateController {
 
   List<TextSpan> _createLaneTextWithTime(
     LaneFullState laneFullState,
-    Duration? virtualClimbingTime,
+    LaneTiming timing,
   ) {
     List<TextSpan> climbingTimeTextSpans = [];
     if (laneFullState.state == LaneFullState_State.FALSE_START ||
@@ -400,25 +393,104 @@ class UIStateController {
     } else if (laneFullState.state == LaneFullState_State.FALL) {
       climbingTimeTextSpans.add(TextSpan(text: 'FALL'));
     } else {
-      int climbingTime = laneFullState.climbingTime;
-      if (laneFullState.state == LaneFullState_State.RUNNING_FOOT_DOWN ||
-          laneFullState.state == LaneFullState_State.RUNNING) {
-        if (virtualClimbingTime != null) {
-          climbingTime =
-              ((virtualClimbingTime.inMilliseconds / 100).toInt()) * 100;
-        }
-      }
       climbingTimeTextSpans.add(
-        TextSpan(text: (climbingTime / 1000.0).toStringAsFixed(3)),
+        TextSpan(text: _formatMilliseconds(timing.primaryTimeMilliseconds)),
       );
     }
     return climbingTimeTextSpans;
   }
 
+  List<List<TextSpan>> _createLaneDetailLines(
+    LaneFullState laneFullState,
+    LaneTiming timing,
+  ) {
+    final detailLines = <List<TextSpan>>[];
+
+    if (timing.reactionTimeMilliseconds != null) {
+      final reactionTime = <TextSpan>[
+        const TextSpan(text: 'reaction time: '),
+        TextSpan(
+          text: _formatMilliseconds(timing.reactionTimeMilliseconds!),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ];
+
+      final stopwatchSettings = lastUIState.settings.stopwatchSettings;
+      if (stopwatchSettings.hasTrainingClassicRaceMode() &&
+          stopwatchSettings.trainingClassicRaceMode.hasFalseStartSettings() &&
+          stopwatchSettings.trainingClassicRaceMode.falseStartSettings
+              .hasBehaviour() && // ignore: deprecated_member_use_from_same_package
+          stopwatchSettings
+              .trainingClassicRaceMode
+              .falseStartSettings
+              .behaviour // ignore: deprecated_member_use_from_same_package
+              .hasContinueAfterFalseStart() &&
+          laneFullState.hasExtraState() &&
+          laneFullState.extraState.hasTrainingClassicRaceExtraState() &&
+          laneFullState
+              .extraState
+              .trainingClassicRaceExtraState
+              .timeIsCalculated) {
+        final assumedReactionTime =
+            stopwatchSettings
+                .trainingClassicRaceMode
+                .falseStartSettings
+                .behaviour // ignore: deprecated_member_use_from_same_package
+                .continueAfterFalseStart
+                .assumedReactionTime;
+        reactionTime.addAll([
+          const TextSpan(text: ' ('),
+          TextSpan(
+            text: '$assumedReactionTime',
+            style: const TextStyle(decoration: TextDecoration.lineThrough),
+          ),
+          const TextSpan(text: ')'),
+        ]);
+      }
+
+      if (timing.relay != null) {
+        reactionTime.addAll([
+          const TextSpan(text: ' / '),
+          TextSpan(
+            text: _formatMilliseconds(
+              timing.relay!.secondReactionTimeMilliseconds,
+            ),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ]);
+      }
+
+      detailLines.add(reactionTime);
+    }
+
+    if (timing.relay?.showClimbingTimes == true) {
+      detailLines.add([
+        const TextSpan(text: 'climbing time: '),
+        TextSpan(
+          text: _formatMilliseconds(
+            timing.relay!.firstClimbingTimeMilliseconds,
+          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const TextSpan(text: ' / '),
+        TextSpan(
+          text: _formatMilliseconds(
+            timing.relay!.secondClimbingTimeMilliseconds,
+          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ]);
+    }
+
+    return detailLines;
+  }
+
+  String _formatMilliseconds(int milliseconds) {
+    return (milliseconds / 1000.0).toStringAsFixed(3);
+  }
+
   String? _createLaneSubText(LaneFullState laneFullState) {
-    if (laneFullState.reactionTime != 0) {
-      return 'Reaction Time: ${(convertReactionTimeToDuration(laneFullState.reactionTime).inMilliseconds / 1000).toStringAsFixed(3)}';
-    } else if (laneFullState.state == LaneFullState_State.IDLE_FOOT_DOWN) {
+    if (laneFullState.state == LaneFullState_State.IDLE_FOOT_DOWN) {
       return 'FOOT OK';
     } else if (laneFullState.state == LaneFullState_State.READY_FOOT_DOWN) {
       return 'READY';
@@ -463,10 +535,12 @@ class UIStateController {
       laneFullState,
       otherLaneStates,
     );
-    uiLaneState.laneTextTime = _createLaneTextWithTime(
+    final timing = calculateLaneTiming(
       laneFullState,
       lastUIState.stopwatchDuration,
     );
+    uiLaneState.laneTextTime = _createLaneTextWithTime(laneFullState, timing);
+    uiLaneState.laneDetailLines = _createLaneDetailLines(laneFullState, timing);
     uiLaneState.laneTextColor = _determineLaneTextColor(laneFullState);
     uiLaneState.laneSubtext = _createLaneSubText(laneFullState);
 
@@ -475,16 +549,13 @@ class UIStateController {
 
   void _onRaceState(RaceFullState raceFullState) {
     lastUIState.raceState = raceFullState.state;
+    _handleRaceTimerState(raceFullState);
 
     final nextLaneStates = [
       for (final (index, lane) in raceFullState.laneStates.indexed)
         _createUILaneState(raceFullState, index, lane),
     ];
     lastUIState.laneStates = nextLaneStates;
-
-    for (final laneState in nextLaneStates) {
-      _handleLaneStateChange(laneState, raceFullState);
-    }
     _handleAutostartProgress(raceFullState, lastUIState.settings);
     _computeAvailableRaceActions(raceFullState, lastUIState.settings);
     _computeOnPressedFunctions(
